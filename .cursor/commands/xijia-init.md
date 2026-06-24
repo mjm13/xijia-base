@@ -29,7 +29,8 @@ The argument after `/xijia:init` can be:
 - Stop by default if `docs/` or `AGENTS.md` already exists
 - Do not set technology stack without user confirmation
 - Install 2-3 top-rated skills per confirmed stack
-- Report created files and installed skills
+- Run `self-check` before marking `done`
+- Report created files, installed skills, and self-check result
 
 ## Output format
 
@@ -38,10 +39,15 @@ Always return a concise status block:
 ```markdown
 ## Xijia Init Status
 
-- Stage: <guard|interview|preview|generate|skills-install|done>
+- Stage: <guard|interview|manifest-confirm|scaffold|skills-bootstrap|self-check|done>
 - Created: <files/directories>
 - Stack Confirmed: <yes/no + summary>
 - Skills Installed: <list>
+- SelfCheck:
+  - requiredFiles: <pass/fail + details>
+  - frontmatterValidity: <pass/fail + details>
+  - entrypointAvailability: <pass/fail + details>
+  - driftScan: <pass/fail + details>
 - Next: <next suggested action>
 - Blockers: <none or list>
 ```

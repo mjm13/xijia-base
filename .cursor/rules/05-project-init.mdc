@@ -25,6 +25,9 @@ alwaysApply: true
 2. 不覆盖已有文件（默认空仓库模式）
 3. 技术栈必须先确认，再安装技能
 4. 技能安装结果必须可追溯（候选/评分/来源/结果）
+5. 基线规则与技能保持技术栈无关，栈具体测试/实现细节由确认技术栈后安装的技能提供
+6. 初始化完成前必须通过 `self-check`（文件、frontmatter、入口可用性、漂移扫描）
+7. 任一自检失败状态置为 `blocked`，不得宣告 `done`
 
 # Guard 与模式
 
@@ -70,4 +73,5 @@ alwaysApply: true
 - 新增清单与跳过清单
 - 技术栈确认结果
 - 技能评分与安装结果
+- 自检结果（requiredFiles/frontmatterValidity/entrypointAvailability/driftScan）
 - 下一步（`/xijia:start`）

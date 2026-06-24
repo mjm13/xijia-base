@@ -15,7 +15,7 @@ description: 从需求中提炼 DDD 产物并沉淀到 docs/domain/developing
 | **混合 change** | 必须（仅建模业务部分） |
 | **技术 change** | **跳过**——工程骨架、日志、Actuator 等横切能力不属于限界上下文 |
 
-技术 change 示例：`springboot-backend-skeleton` 不调用本 skill；若后端对接已有 `identity-access`，仅在归档后由 `sync-knowledge` 更新该条目描述，不新建 `logging` / `api-foundation` 等 context。
+技术 change 示例：`backend-skeleton` 不调用本 skill；若后端对接已有业务上下文，仅在归档后由 `sync-knowledge` 更新该条目描述，不新建 `logging` / `api-foundation` 等 context。
 
 # 输入
 

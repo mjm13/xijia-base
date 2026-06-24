@@ -1,0 +1,31 @@
+---
+description: 规则漂移检测（防止回流到栈绑定术语）
+alwaysApply: true
+---
+
+# 目标
+
+对 `.cursor/rules` 与 `.cursor/skills` 执行轻量关键词扫描，避免基线规则回流到技术栈绑定表述。
+
+# 适用范围
+
+- `.cursor/rules/**/*.mdc`
+- `.cursor/skills/**/*.md`
+
+# 黑名单关键词（初始）
+
+`Flyway|MyBatis|Spring|JUnit|@SpringBootTest|Mapper|Maven|org_node|BCrypt|Vitest|vite.config`
+
+> 仅用于扫描配置，不构成基线约束。
+
+# 处理策略
+
+1. 命中黑名单时，优先改为技术栈无关表达。
+2. 若确需出现（例如外部生态示例、迁移说明、兼容文档）：
+   - 必须在同段附加“仅示例，不构成基线约束”说明。
+   - 不得把该术语写成默认流程要求。
+3. 漂移扫描结果必须纳入初始化 `self-check` 的 `driftScan` 字段。
+
+# 通过标准
+
+- 基线规则与技能中无黑名单命中；或命中项均附免责说明且不构成默认约束。

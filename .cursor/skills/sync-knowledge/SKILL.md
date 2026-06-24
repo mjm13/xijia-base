@@ -31,5 +31,5 @@ description: 归档后知识回灌（spec/change -> docs/domain/established + AD
 - 未归档 change 的内容不得写入 `docs/domain/established/*`
 - 回灌优先做增量修改，避免重写整份文档
 - 技术 / UI 壳层 change 不写入 `docs/domain/established/context-map.md`、`domain-model.md` 或 `ubiquitous-language.md`；`platform-shell`、布局、Design Token、AuthStore、框架类名、拦截器、具体鉴权库 API 等内容应写入 ADR、`docs/architecture.md`、OpenSpec 技术 spec 或 `docs/capability-map.md`
-- `docs/capability-map.md` 只记录模块级指针，不复制子菜单、路由明细或表结构；真相分别在前端路由/菜单、OpenSpec specs 与 Flyway
+- `docs/capability-map.md` 只记录模块级指针，不复制子菜单、路由明细或表结构；真相分别在前端路由/菜单、OpenSpec specs 与迁移脚本
 - 需求文档物理位置须与 `status` 一致（见 `00-workflow.mdc` 文档状态模型）

@@ -71,8 +71,8 @@ alwaysApply: true
 - UI / 技术实现词不写入 DDD 统一语言或领域模型：如 `App Shell`、`MainLayout`、`Design Token`、`AuthStore`、框架类名、拦截器、具体鉴权库 API。它们应放在 `docs/architecture.md`、ADR、OpenSpec 技术 spec 或 `docs/capability-map.md`
 
 **数据库三层（结构与语义分离）：**
-- 结构真相 = Flyway 迁移脚本（可执行，不抄进 docs）
-- 实时读取 = MySQL MCP（只读）
+- 结构真相 = 迁移脚本（可执行，不抄进 docs）
+- 实时读取 = 数据库 MCP（只读）
 - 业务语义 = 数据字典（字段业务含义、状态机、约束理由——DDL 里看不出的代码外知识）
 
 **能力追溯索引（按需求发布节点维护，三档通用）：**
@@ -81,7 +81,7 @@ alwaysApply: true
 - 维护节点按档位（发布即收尾）：
   - 🔴：在 `sync-knowledge` 收尾时检查更新
   - 🟢 / 🟡：在该需求完成、人确认收尾时直接检查更新（这两档不走 `sync-knowledge`，不得因此漏掉）
-- 数据表字段语义仍写 `data-dictionary.md`；表结构仍以 Flyway 为唯一真相
+- 数据表字段语义仍写 `data-dictionary.md`；表结构仍以迁移脚本为唯一真相
 
 **developing vs established 的写入规则：**
 - 🔴（OpenSpec change 在飞行中）：先写 `developing/`，归档后由 `sync-knowledge` 提升到 `established/`
@@ -120,6 +120,7 @@ alwaysApply: true
 # 联动门禁
 
 - 每个 change 建议先建立独立 worktree 与分支 `change/<name>`
+- 初始化完成判定需通过 `05-project-init.mdc` 的 self-check，并通过 `06-rule-drift-guard.mdc` 的漂移扫描
 - propose 前必须在 proposal 中标注 change 类型（业务 / 技术 / 混合）
 - propose 前统一语言：**业务 / 混合 change 的业务术语**必须具备 `ubiquitous-language` 条目；**技术 / UI 壳层 change** 不写入 DDD 统一语言，除非该术语会成为业务人员也使用的领域语言
 - **proposal 必含范围三段**：`In Scope` / `Out of Scope` / `Open Questions & Deferred`。想不清的链路写进第三段显式 park，禁止塞进 design 假装确定
@@ -206,7 +207,7 @@ Spec/design 是自然语言意图，没有裁判机制；测试可执行、有 p
 # Approval Gates（必须暂停并请求用户确认）
 
 - 破坏性数据库变更（删表/删列/改类型/数据回填）
-- 新增关键外部依赖（Feign、三方 API、核心包）
+- 新增关键外部依赖（三方 API、外部服务、核心包）
 - 删除或下线已上线能力
 - 权限、密钥、安全策略相关变更
 - 跨限界上下文的大规模架构调整
