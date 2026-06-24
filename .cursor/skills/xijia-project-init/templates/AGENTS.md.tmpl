@@ -1,0 +1,26 @@
+# AGENTS.md — {{project_name}} 协作入口地图
+
+> 本文件是入口路由，不是规则正文。规则真相源位于 `.cursor/rules/`。
+
+## 0. 第一步读什么
+
+| 想做的事 | 先读 | 说明 |
+| --- | --- | --- |
+| 初始化空仓库 | `/xijia:init` | 生成文档骨架与初始结构 |
+| 推进具体需求 | `.cursor/rules/00-workflow.mdc` | 分级/判型/门禁/收尾 |
+| 了解架构与约定 | `docs/architecture.md` / `docs/conventions.md` | 分层、流程、验收 |
+
+## 1. 统一研发流水线
+
+`explore -> propose -> apply -> verify -> sync -> archive -> sync-knowledge -> commit`
+
+- 手动入口：`/xijia:start`
+- 自动入口：`feature-pipeline`
+- 状态命令：`/xijia:status`、`/xijia:stop`
+
+## 2. 项目信息
+
+- 项目：{{project_name}}
+- 目标：{{project_goal}}
+- 初始模块：{{primary_modules}}
+- 维护者：{{author}}

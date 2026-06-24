@@ -1,0 +1,73 @@
+---
+description: 空仓库初始化规则（xijia:init / xijia-project-init）
+alwaysApply: true
+---
+
+# 初始化路由规则
+
+当用户意图为以下任一项时，优先进入初始化路径，而不是普通需求路径：
+
+- 初始化项目
+- 从零搭建文档骨架
+- 新项目冷启动
+- 生成 AGENTS/docs 初始结构
+
+对应入口：
+
+- 手动：`/xijia:init`
+- 自动：`xijia-project-init` skill
+
+# 初始化边界
+
+初始化属于技术 change（项目骨架/流程基建），遵循以下边界：
+
+1. 只处理结构与文档骨架，不实现业务代码
+2. 不覆盖已有文件（默认空仓库模式）
+3. 技术栈必须先确认，再安装技能
+4. 技能安装结果必须可追溯（候选/评分/来源/结果）
+
+# Guard 与模式
+
+默认模式：`empty-repo`
+
+- 若仓库存在 `docs/` 或 `AGENTS.md`，默认停止并提示改用 `/xijia:start`
+- 仅在用户明确要求时启用 `supplement-only`（仅新增缺失文件）
+- `supplement-only` 不得覆盖任何已存在文件
+
+# 技能安装规则
+
+在用户确认技术栈后，执行技能安装：
+
+1. 每个技术栈选择评分最高的 2-3 个技能
+2. 评分至少考虑：生态适配、活跃度、社区采用、规范完整度、安装稳定性
+3. 目标路径统一为 `.cursor/skills/`
+4. 若安装工具写入 `.agents/skills/`，必须搬运并校验
+5. 校验 `SKILL.md` frontmatter：`name` 与目录一致
+
+# 初始化交付最小集（必须包含）
+
+- `AGENTS.md`
+- `docs/README.md`
+- `docs/architecture.md`
+- `docs/conventions.md`
+- `docs/glossary.md`
+- `docs/capability-map.md`
+- `docs/decisions/0001-project-bootstrap.md`
+- `docs/domain/README.md`
+- `docs/domain/established/context-map.md`
+- `docs/domain/established/domain-model.md`
+- `docs/domain/established/ubiquitous-language.md`
+- `docs/requirements/requirements-template.md`
+- `docs/plans/README.md`
+- `docs/openspec/config.yaml`
+
+# 输出要求
+
+初始化完成后必须输出结构化状态块，包含：
+
+- 阶段（guard/interview/manifest-confirm/scaffold/skills-bootstrap/done）
+- 模式（empty-repo/supplement-only）
+- 新增清单与跳过清单
+- 技术栈确认结果
+- 技能评分与安装结果
+- 下一步（`/xijia:start`）
