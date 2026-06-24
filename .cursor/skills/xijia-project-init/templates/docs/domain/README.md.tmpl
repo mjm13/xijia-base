@@ -1,8 +1,17 @@
 # Domain Docs
 
-本目录用于沉淀领域知识：
+本目录沉淀**已发布的领域知识**，是 AI 理解“现状 / 已有功能”的唯一真相源。
 
-- `developing/`：开发中（可回滚）
-- `established/`：已归档事实
+## 文件（按需创建，init 阶段不预生成）
 
-初始化仅创建最小骨架；后续按需求增量沉淀。
+- `context-map.md`：限界上下文与上下游关系
+- `domain-model.md`：聚合、不变量、状态机、领域事件
+- `ubiquitous-language.md`：业务术语与锚点
+- `data-dictionary.md`：字段业务语义、状态机、约束理由
+
+**AI 读取现状只读本目录**，不读任何 change 草稿。
+
+## 开发中的领域草稿在哪
+
+- 🔴 OpenSpec change：草稿写在对应 change 文件夹 `docs/openspec/changes/<name>/domain/`，归档后由 `sync-knowledge` 提升到本目录，草稿随 change 离场
+- 🟢 / 🟡 无 change：人确认后直接写本目录

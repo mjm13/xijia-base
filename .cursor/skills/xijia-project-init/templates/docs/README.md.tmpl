@@ -1,21 +1,30 @@
 # 文档索引（Docs Index）
 
-本目录承载 {{project_name}} 的需求、架构、决策与领域知识。
+本目录承载 {{project_name}} 的需求、方案、规格、决策与领域知识沉淀。
 
-## 目录说明
+## 核心目录职责
 
-- `requirements/inbox/`：需求入口
-- `requirements/requirements-template.md`：需求模板
-- `capability-map.md`：能力追溯索引
-- `domain/`：领域知识（developing / established）
-- `architecture.md`：系统与分层架构
-- `conventions.md`：研发约定与门禁
-- `decisions/`：ADR 决策记录
-- `openspec/`：规格与 change 产物
+- `requirements/`：记录“要做什么 + 如何验收”（需求入口与状态流转）
+- `plans/`：承载 🟢/🟡 需求计划、spike 发现与人工验收说明
+- `openspec/`：承载 🔴 核心需求的规格驱动变更（proposal/design/tasks/spec）
+- `decisions/`：ADR，记录“为什么这样决策”
+- `domain/`：已发布领域语义（AI 读现状只读这里；🔴 开发中草稿在对应 change 文件夹）
 
-## 当前项目
+## 何时写到哪里
 
-- 名称：{{project_name}}
-- 目标：{{project_goal}}
-- 初始模块：{{primary_modules}}
-- 技术栈（已确认）：{{chosen_stack_summary}}
+1. 新需求先进入 `requirements/inbox/`
+2. 若为 🟢/🟡，方案落 `plans/`
+3. 若为 🔴，变更产物落 `openspec/changes/`
+4. 涉及关键权衡时，补充 `decisions/`（ADR）
+5. 需求归档后，把稳定业务语义回灌 `domain/`
+
+## 分档路由
+
+- 🟢 轻量：`requirements` + `plans`
+- 🟡 中等：`requirements` + `plans`（必要时补 ADR / domain）
+- 🔴 核心：`requirements` + `openspec` + `decisions` + `domain`
+
+## 按需创建文件
+
+- `architecture.md`：需求收尾阶段需要沉淀架构决策时创建/更新
+- `capability-map.md`：需求收尾阶段命中能力追溯触发条件时创建/更新

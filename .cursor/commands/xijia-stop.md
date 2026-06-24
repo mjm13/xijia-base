@@ -18,7 +18,7 @@ Provide a safe, auditable stop flow instead of leaving half-done artifacts.
 3. Invoke and follow `abandon-change`.
 4. Ensure the dropped path is complete:
    - Do not run `/opsx:sync`
-   - Roll back developing domain entries introduced by this change
+   - Discard the change's domain drafts (in `docs/openspec/changes/<name>/domain/`); `docs/domain` is untouched
    - Mark requirement status as `dropped`
 5. Summarize what was discarded vs retained.
 
@@ -31,7 +31,7 @@ Provide a safe, auditable stop flow instead of leaving half-done artifacts.
 - Reason: <text>
 - Action: abandoned
 - Synced Specs: no
-- Domain Developing Cleanup: <done/pending + notes>
+- Domain Draft Cleanup: <done/pending + notes>
 - Requirement Status: dropped
 - Next: <optional follow-up>
 ```

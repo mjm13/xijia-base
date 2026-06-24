@@ -9,7 +9,7 @@ alwaysApply: true
 
 | 类型 | 定义 | 示例 | 领域文档（`docs/domain`） | 主要文档 |
 | --- | --- | --- | --- | --- |
-| **业务 change** | 引入或变更业务能力、规则、术语、上下文边界 | 指标填报、审批流、权限模型 | 必须更新 `docs/domain/developing/*`（context-map / ubiquitous-language / domain-model） | OpenSpec + domain |
+| **业务 change** | 引入或变更业务能力、规则、术语、上下文边界 | 指标填报、审批流、权限模型 | 🔴 草稿写入 change 文件夹 `docs/openspec/changes/<name>/domain/`（context-map / ubiquitous-language / domain-model），归档后提升到 `docs/domain/*` | OpenSpec + domain |
 | **技术 change** | 工程骨架、横切能力、工具链、UI 壳层；无新业务规则 | `springboot-backend-skeleton`、`platform-shell`（布局 / 路由 / Design Token） | **不写入 `docs/domain` 的 context-map / domain-model / ubiquitous-language**；如影响业务能力，只在已有业务上下文中记录业务语义变化，不记录框架/布局实现 | OpenSpec `design.md` + ADR / `docs/architecture.md` / `docs/capability-map.md` |
 | **混合 change** | 既有基建又有业务规则 | 后端鉴权 + RBAC 策略 | 仅建模业务部分；基建写入 ADR / design | 两者兼有 |
 
@@ -27,7 +27,7 @@ alwaysApply: true
 | 档位 | 适用 | 流程 | 持久化 |
 | --- | --- | --- | --- |
 | 🟢 轻量 | 配置/文案/样式变更、简单 CRUD、独立前端页面 | **Plan Mode**：AI 出方案 → 人审 → 执行；不进 OpenSpec | 方案落 `docs/plans/`（值得留则留） |
-| 🟡 中等 | 单一上下文内常规功能、弱不变量 | **Plan Mode + 可选 Superpowers**（含可测逻辑时）；需沉淀领域知识则补 `docs/domain/developing/*` | 计划落 `docs/plans/`；必要时 ADR |
+| 🟡 中等 | 单一上下文内常规功能、弱不变量 | **Plan Mode + 可选 Superpowers**（含可测逻辑时）；需沉淀领域知识则在收尾后直接写 `docs/domain/*` | 计划落 `docs/plans/`；必要时 ADR |
 | 🔴 核心 | 资金链路、权限模型、复杂业务规则、跨上下文、多聚合 | **完整 OpenSpec + Superpowers**（`openspec-superpowers-apply`） | OpenSpec specs + `docs/domain` |
 
 **分级原则**：
@@ -63,7 +63,7 @@ alwaysApply: true
 **沉淀三问（任一为「是」即沉淀）：**
 1. 是业务规则 / 不变量吗？（如「投标截止后不可撤回」「扣费不退款」）→ `docs/domain`（ubiquitous-language / domain-model）
 2. 是非显而易见的决策及其原因吗？→ `docs/decisions`（ADR）
-3. 是数据库 / 字段的业务语义、状态流转、约束理由吗？→ `docs/domain/.../data-dictionary.md`
+3. 是数据库 / 字段的业务语义、状态流转、约束理由吗？→ `docs/domain/data-dictionary.md`
 
 **不沉淀：**
 - 与代码重叠的实现细节——**代码即文档**，抄进 docs 必然漂移
@@ -83,16 +83,28 @@ alwaysApply: true
   - 🟢 / 🟡：在该需求完成、人确认收尾时直接检查更新（这两档不走 `sync-knowledge`，不得因此漏掉）
 - 数据表字段语义仍写 `data-dictionary.md`；表结构仍以迁移脚本为唯一真相
 
-**developing vs established 的写入规则：**
-- 🔴（OpenSpec change 在飞行中）：先写 `developing/`，归档后由 `sync-knowledge` 提升到 `established/`
-- 🟢 / 🟡（无 OpenSpec change，完成即既成事实）：人确认后**直接写 `established/`**
-- `developing/` 仅用于隔离「未归档 OpenSpec change」，不阻塞轻量需求的沉淀
+**按需文档创建时机（硬门禁）：**
+- `docs/architecture.md`、`docs/capability-map.md` 仅允许在**需求收尾阶段**创建或更新（🔴 在 `sync-knowledge`，🟢/🟡 在完成收尾的文档同步步骤）
+- 开发进行中（explore/propose/apply/verify）不得创建上述文件；如需先记录判断，写入 change design / tasks / ADR 草案，待收尾再落库到 docs
+
+**AGENTS.md（活文档，分阶段增量、收尾更新）：**
+- `AGENTS.md` 的「代码结构与运行方式 / 项目信息」随真实进展增量生长，**仅在需求收尾阶段更新**，开发中不写
+- 触发条件（任一命中即在收尾更新）：新增/变更可运行结构（后端/前端骨架、目录布局）、运行/测试/构建命令变化、业务模块增减
+- 「入口路由 / 统一研发流水线」属静态基线，不随单个 change 改动
+- 典型分阶段：init 仅占位 → 后端骨架收尾补后端结构与运行方式 → 前端骨架收尾补前端 → 业务模块上线时更新项目信息并链接 `capability-map.md`
+
+**领域知识写入规则（`docs/domain` 只存已发布事实）：**
+- `docs/domain/*` 是 AI 读取「现状 / 已有功能」的**唯一真相源**；**AI 理解现状只读 `docs/domain`，不读任何 change 草稿**
+- 🔴（OpenSpec change 在飞行中）：领域草稿写入 change 文件夹 `docs/openspec/changes/<name>/domain/`；归档后由 `sync-knowledge` 提升到 `docs/domain/`，提升后草稿随 change 一并归档离场
+- 🟢 / 🟡（无 OpenSpec change，完成即既成事实）：人确认后**直接写 `docs/domain/`**
+- 任何未发布 / 在飞内容都不得进入 `docs/domain/*`
+- `docs/domain/*`（context-map / domain-model / ubiquitous-language / data-dictionary）按需创建：首个业务 change 收尾时若不存在则创建，init 阶段不预生成（仅留 `docs/domain/README.md`）
 
 # 主流程（🔴 档完整流水线；🟢🟡 见上表，到对应档位即停）
 
 当用户提出 🔴 核心需求时，执行以下流水线：
 
-1. `explore`：用 `/opsx:explore` 探索问题；**业务 change** 补齐 `docs/domain/developing/*` 条目，**技术 change** 跳过 domain 新建，必要时写 ADR 草案
+1. `explore`：用 `/opsx:explore` 探索问题；**业务 change** 在 change 文件夹 `docs/openspec/changes/<name>/domain/` 起草领域条目，**技术 change** 跳过 domain 新建，必要时写 ADR 草案
 2. `propose`：用 `/opsx:propose` 生成 proposal/design/tasks
 3. `apply`：用 **openspec-superpowers-apply** 实现任务（OpenSpec 管 tasks 进度，Superpowers 管 TDD/验证/评审；禁止裸跑 apply）
 4. `verify`：执行测试、验证与代码评审
@@ -103,7 +115,7 @@ alwaysApply: true
 # 文档状态模型
 
 - 需求：`inbox -> in-change(<name>) -> shipped/dropped`
-- 领域条目：`developing -> established`
+- 领域条目：`change 草稿（docs/openspec/changes/<name>/domain）-> docs/domain`
 - ADR：`proposed -> accepted -> superseded/deprecated`
 
 **需求文档物理位置随状态迁移**（frontmatter `status` 与目录必须一致）：
@@ -128,12 +140,12 @@ alwaysApply: true
   - **业务 / 混合 change**：领域设计小节 + 分层裁剪决策
   - **技术 change**：技术方案小节（栈选型、目录结构、横切能力清单）+ 分层裁剪决策；**不要求**虚构领域模型
 - 技术 / UI 壳层 change 的关键决策写入 `docs/decisions/`（ADR）、`docs/architecture.md` 或 `docs/capability-map.md`，不写 `context-map` 新 context，也不在 `domain-model.md` 虚构无聚合的模型
-- 开发中的领域内容只能写入 `docs/domain/developing/*`；仅在 `sync -> archive -> sync-knowledge` 后可提升到 `docs/domain/established/*`
+- 开发中的领域草稿只写入 change 文件夹 `docs/openspec/changes/<name>/domain/`；仅在 `sync -> archive -> sync-knowledge` 后提升到 `docs/domain/*`
 - 收尾仅两条路径：
   - 完成：`sync -> archive -> sync-knowledge`；收尾时检查能力追溯索引、数据字典与必要 ADR，**输出「人工验收说明」**，将需求 `status` 置 `shipped` 并 `git mv` 到 `docs/requirements/shipped/`
   - 放弃：`abandon-change`；收尾时将需求 `status` 置 `dropped` 并 `git mv` 到 `docs/requirements/dropped/`
 - 🟢 / 🟡 收尾同样必须**输出「人工验收说明」**（见下方专节）
-- 未归档 change 不得写入 `docs/domain/established/*`
+- 未归档 change 不得写入 `docs/domain/*`（已发布事实）
 
 # 需求收尾门禁（提交为最终操作）
 
@@ -144,7 +156,7 @@ alwaysApply: true
 对当前需求，按序执行，**末步必须是 commit**：
 
 1. **verify**：测试/构建通过（有命令输出证据）
-2. **文档同步**（🔴：`sync → archive → sync-knowledge`；🟢/🟡：计划/需求 AC、capability-map、数据字典等该写的写完）
+2. **文档同步**（🔴：`sync → archive → sync-knowledge`；🟢/🟡：计划/需求 AC、capability-map、数据字典等该写的写完）；命中触发条件时一并更新活文档 `AGENTS.md`（代码结构 / 运行方式 / 项目信息）
 3. **需求状态**：`# 验收记录` 已写入；`status: shipped`（或 `dropped`）；物理路径与 status 一致（`shipped/` 或 `dropped/`）
 4. **git commit**：将本需求相关的**代码 + 已同步文档**一次性提交；commit message 聚焦「为什么」
 5. **（可选）push**：仅当用户明确要求

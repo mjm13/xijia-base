@@ -14,7 +14,7 @@ disable-model-invocation: true
 - change 类型判定（business/technical/hybrid）
 - OpenSpec 产物与实现
 - Superpowers 的 TDD/调试/验证/评审
-- 归档与知识回灌（developing -> established）
+- 归档与知识回灌（change 草稿 -> docs/domain）
 
 ## 何时使用
 
@@ -36,8 +36,8 @@ disable-model-invocation: true
 1. 严格遵守 `.cursor/rules/00-workflow.mdc`
 2. 先分级再选流程（green/yellow/red）
 3. 先判 change type 再 propose（business/technical/hybrid）
-4. 未归档内容只写 `docs/domain/developing/*`
-5. 仅在归档后通过 `sync-knowledge` 提升到 `docs/domain/established/*`
+4. 未归档领域草稿只写 `docs/openspec/changes/<name>/domain/`
+5. 仅在归档后通过 `sync-knowledge` 提升到 `docs/domain/*`
 
 ## 编排总览
 
@@ -62,7 +62,7 @@ disable-model-invocation: true
 
 1. **探索**
    - 调用 `openspec-explore`
-   - 若为 business/hybrid：调用 `ddd-modeling`，写 `docs/domain/developing/*`
+   - 若为 business/hybrid：调用 `ddd-modeling`，写 `docs/openspec/changes/<name>/domain/`
 
 2. **提案**
    - 调用 `openspec-propose`（或 `/opsx:propose`）
@@ -84,14 +84,14 @@ disable-model-invocation: true
 
 6. **知识回灌**
    - 调用 `sync-knowledge`
-   - 将已落地内容从 `docs/domain/developing/*` 提升到 `docs/domain/established/*`
+   - 将已落地内容从 change 草稿 `docs/openspec/changes/<name>/domain/*` 提升到 `docs/domain/*`
 
 ### C. 放弃路径
 
 当用户决定中止：
 
 - 调用 `abandon-change`
-- 回滚 developing 条目
+- 丢弃 change 草稿（随 change 一并放弃，`docs/domain` 不受影响）
 - 不执行 sync
 
 ## Approval Gates（命中即暂停）
@@ -126,7 +126,7 @@ disable-model-invocation: true
 3. specs 已同步（或明确确认跳过并说明原因）
 4. change 已归档
 5. `sync-knowledge` 已执行（🔴）；🟢/🟡 等价文档已更新
-6. developing/established 状态一致，无悬挂条目
+6. `docs/domain` 与 change 草稿状态一致，无悬挂条目
 7. **已写入「人工验收说明」**：追加到需求文件 `# 验收记录` 段（🟢/🟡 只有计划文档时追加到 `docs/plans/`），并在摘要复述
 8. **git commit 已成功**：本需求相关代码与已同步文档均已提交；**以 commit 为最终操作**
 

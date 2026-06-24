@@ -2,7 +2,7 @@
 name: /xijia-sync-knowledge
 id: xijia-sync-knowledge
 category: Workflow
-description: Promote confirmed knowledge from developing to established after archive
+description: Promote confirmed knowledge from change drafts to docs/domain after archive
 ---
 
 Run post-archive knowledge promotion using the project standard.
@@ -11,8 +11,8 @@ Run post-archive knowledge promotion using the project standard.
 
 After a change is archived, promote valid domain knowledge from:
 
-- `docs/domain/developing/*`
-- to `docs/domain/established/*`
+- `docs/openspec/changes/<name>/domain/*` (in-flight change drafts)
+- to `docs/domain/*`
 
 and capture durable ADR-level decisions.
 
@@ -25,7 +25,7 @@ and capture durable ADR-level decisions.
    - Promoted entries
    - Dropped/rolled-back entries
    - ADR updates
-5. Ensure no accidental write to `established/*` from unarchived work.
+5. Ensure no accidental write to `docs/domain/*` from unarchived work.
 
 ## Output format
 
@@ -34,10 +34,10 @@ and capture durable ADR-level decisions.
 
 - Change: <name>
 - Archived: <yes/no>
-- Promoted to Established:
+- Promoted to docs/domain:
   - <item 1>
   - <item 2>
-- Removed from Developing:
+- Removed Change Drafts:
   - <item A>
 - ADR Updates:
   - <adr file or none>
@@ -46,5 +46,5 @@ and capture durable ADR-level decisions.
 
 ## Guardrails
 
-- If evidence is insufficient, keep content in `developing/*` and report uncertainty.
+- If evidence is insufficient, keep content in the change draft folder and report uncertainty.
 - Prefer incremental updates; avoid rewriting whole files unless necessary.

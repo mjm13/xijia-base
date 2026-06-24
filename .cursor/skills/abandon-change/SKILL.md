@@ -18,7 +18,7 @@ description: 放弃未完成功能的对称收尾流程
 2. 丢弃对应 worktree/分支中的未合并代码
 3. 不执行 `/opsx:sync`，避免污染主 specs
 4. 将 change 移入 `docs/openspec/changes/archive/<date>-<name>-dropped/`
-5. 回滚本 change 引入但未落地的领域条目（`developing`）
+5. 丢弃本 change 文件夹内的领域草稿（`docs/openspec/changes/<name>/domain/`）；`docs/domain` 未被污染，无需回滚
 6. 将需求 `status` 标记为 `dropped`，记录原因，并用 `git mv` 移到 `docs/requirements/dropped/`（目录不存在则创建）；移动后 Grep 修正引用该路径的文档，避免死链
 
 # 约束

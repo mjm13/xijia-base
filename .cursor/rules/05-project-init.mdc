@@ -51,18 +51,19 @@ alwaysApply: true
 
 - `AGENTS.md`
 - `docs/README.md`
-- `docs/architecture.md`
-- `docs/conventions.md`
-- `docs/glossary.md`
-- `docs/capability-map.md`
 - `docs/decisions/0001-project-bootstrap.md`
 - `docs/domain/README.md`
-- `docs/domain/established/context-map.md`
-- `docs/domain/established/domain-model.md`
-- `docs/domain/established/ubiquitous-language.md`
 - `docs/requirements/requirements-template.md`
 - `docs/plans/README.md`
 - `docs/openspec/config.yaml`
+
+补充约束：
+
+- `docs/architecture.md`、`docs/capability-map.md` 按需创建，不在 init 阶段预生成
+- 上述文件仅允许在需求收尾阶段依据实际改动创建/更新（🔴：`sync-knowledge`；🟢/🟡：完成收尾的文档同步步骤）
+- `AGENTS.md` 在 init 仅生成「路由 / 流水线 / 项目信息」与「代码结构与运行方式」**占位段**；实质运行信息待后端/前端骨架完成后于收尾增量补充（见 `00-workflow.mdc` 活文档规则）
+- `docs/domain/*`（context-map / domain-model / ubiquitous-language）按需创建：首个业务 change 收尾时若不存在则创建，init 阶段不预生成；init 的 `docs/domain/` 只含 `README.md`
+- 不创建 `docs/domain/developing/`：🔴 领域草稿置于对应 change 文件夹 `docs/openspec/changes/<name>/domain/`，归档后提升到 `docs/domain/`
 
 # 输出要求
 
