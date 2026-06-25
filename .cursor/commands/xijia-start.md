@@ -9,7 +9,7 @@ Use `xijia-ops-pipeline` as the single orchestration entry for this request.
 
 ## Goal
 
-Run the requirement through a complete and consistent workflow:
+Run the requirement through a complete and consistent workflow with mandatory human-review stop gates:
 
 1. Tiering: `green | yellow | red`
 2. Change type classification: `business | technical | hybrid`
@@ -30,6 +30,9 @@ The argument after `/xijia:start` can be:
 - Always invoke and follow `xijia-ops-pipeline`
 - Do not skip tiering or change type classification
 - For red tier, do not skip OpenSpec + analyze + Superpowers chain
+- Before implementation, present plan/design and STOP for user approval (Gate-1); no non-doc code changes before approval
+- Before marking acceptance done, migrating requirement status, or archiving, STOP for user acceptance sign-off (Gate-2)
+- Never auto-migrate requirement status (e.g. inbox -> shipped) or auto-archive without explicit user confirmation
 - Do not mark complete without closure checks defined by `xijia-ops-pipeline`
 
 ## Output format

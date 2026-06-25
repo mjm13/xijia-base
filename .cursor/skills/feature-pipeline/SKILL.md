@@ -17,8 +17,8 @@ description: 端到端功能研发编排入口（DDD + OpenSpec + Superpowers）
 
 ## 一句话流程（速记，细节看 xijia-ops-pipeline）
 
-`分级(🟢🟡🔴，链路不清先🧪spike探路) → 判型(业务/技术/混合) → 🔴: explore → propose → analyze → openspec-superpowers-apply → verify → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行，收尾按沉淀三问更新 docs/domain / ADR / capability-map / data-dictionary`
+`分级(🟢🟡🔴，链路不清先🧪spike探路) → 判型(业务/技术/混合) → Gate-1(实现前必须 STOP 待用户批准) → 🔴: explore → propose → analyze → openspec-superpowers-apply → verify → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行；收尾 Gate-2(人工验收签字后方可状态迁移/归档)`
 
 > 实现阶段唯一入口：`openspec-superpowers-apply`（禁止裸跑 `openspec-apply-change`）。
 >
-> **两条默认姿态**：① 迭代切片——一个 change = 一条端到端薄切片（非整模块），proposal 必含 `In Scope / Out of Scope / Open Questions & Deferred`；② 任何档位收尾必须输出「人工验收说明」（改了哪个菜单/模块、什么功能、什么场景、怎么手动点验）。
+> **两条默认姿态**：① 迭代切片——一个 change = 一条端到端薄切片（非整模块），proposal 必含 `In Scope / Out of Scope / Open Questions & Deferred`；② 任何档位收尾必须输出「人工验收说明」（改了哪个菜单/模块、什么功能、什么场景、怎么手动点验），且未经用户签字不得迁移状态或归档。
