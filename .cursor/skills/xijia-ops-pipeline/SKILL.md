@@ -1,7 +1,6 @@
 ---
 name: xijia-ops-pipeline
 description: 统一编排需求分级、OpenSpec 工作流、Superpowers 实现方法和归档回灌。用于用户希望一键推进端到端研发、减少漏步骤、强制闭环时。
-disable-model-invocation: true
 ---
 
 # Xijia Ops Pipeline
@@ -58,6 +57,19 @@ disable-model-invocation: true
 
 **迭代切片（默认姿态）**：需求无法一次描述完时，一个 change = 一条端到端薄切片（非整模块），命名切片化；proposal 必含 `In Scope / Out of Scope / Open Questions & Deferred` 三段，想不清的链路显式 park。
 
+### A.1 Green/Yellow 收尾清单（必须）
+
+当需求不进入 OpenSpec（🟢/🟡）时，收尾必须逐项勾选：
+
+1. 验证证据已输出（测试/构建/检查命令结果）
+2. 已执行「沉淀三问」并写入去向：
+   - 业务规则/不变量 -> `docs/domain/*`
+   - 决策原因 -> `docs/decisions/*`（ADR）
+   - 字段业务语义 -> `docs/domain/data-dictionary.md`
+3. 命中触发条件时更新 `docs/capability-map.md`
+4. 写入人工验收说明（需求文档或 `docs/plans/*`）
+5. 主动提示用户执行 commit；未 commit 不得开始下一需求
+
 ### B. Red 档完整链路
 
 1. **探索**
@@ -68,7 +80,11 @@ disable-model-invocation: true
    - 调用 `openspec-propose`（或 `/opsx:propose`）
    - 强制写入 change type：`business|technical|hybrid`
 
-3. **实现**
+3. **一致性分析（实现前闸门）**
+   - 调用 `openspec-analyze`（或 `/opsx:analyze`）
+   - 若 `Verdict: blocked`，先修 `proposal/design/tasks/spec` 再进入实现
+
+4. **实现**
    - 必须调用 `openspec-superpowers-apply`
    - 实现期强制技能链：
      - `test-driven-development`
@@ -76,13 +92,13 @@ disable-model-invocation: true
      - `verification-before-completion`
      - `requesting-code-review`
 
-4. **规格同步**
+5. **规格同步**
    - 调用 `openspec-sync-specs`（或 `/opsx:sync`）
 
-5. **归档**
+6. **归档**
    - 调用 `openspec-archive-change`（或 `/opsx:archive`）
 
-6. **知识回灌**
+7. **知识回灌**
    - 调用 `sync-knowledge`
    - 将已落地内容从 change 草稿 `docs/openspec/changes/<name>/domain/*` 提升到 `docs/domain/*`
 
@@ -111,7 +127,7 @@ disable-model-invocation: true
 
 - Tier: <green|yellow|red>
 - Change Type: <business|technical|hybrid>
-- Stage: <explore|propose|apply|verify|sync|archive|sync-knowledge|abandon>
+- Stage: <explore|propose|analyze|apply|verify|sync|archive|sync-knowledge|abandon>
 - Done: <what completed>
 - Next: <next command/skill>
 - Blockers: <none or list>
@@ -128,7 +144,7 @@ disable-model-invocation: true
 5. `sync-knowledge` 已执行（🔴）；🟢/🟡 等价文档已更新
 6. `docs/domain` 与 change 草稿状态一致，无悬挂条目
 7. **已写入「人工验收说明」**：追加到需求文件 `# 验收记录` 段（🟢/🟡 只有计划文档时追加到 `docs/plans/`），并在摘要复述
-8. **git commit 已成功**：本需求相关代码与已同步文档均已提交；**以 commit 为最终操作**
+8. **commit 收尾状态已明确**：若用户已要求提交，则 commit 必须成功；若用户尚未要求提交，必须明确标注“待用户触发 commit”，且不得开始下一需求
 
 > 🟢/🟡 不走 OpenSpec，但第 7–8 条同样必须满足。
 

@@ -14,5 +14,6 @@ globs:
   - 关联本 change 文件夹内的领域草稿（`docs/openspec/changes/<name>/domain/`）
 - **technical / UI 壳层 change**：`design.md` 写「技术方案」与分层裁剪决策；不得为了满足模板而虚构领域模型或新限界上下文。
 - `spec.md` 中业务 Requirement 术语优先使用 `docs/domain/ubiquitous-language.md`；新增业务术语写入本 change 草稿 `docs/openspec/changes/<name>/domain/ubiquitous-language.md`。UI / 技术实现词（如 App Shell、MainLayout、Design Token、AuthStore、具体框架 API）不写入 DDD 统一语言。
+- `spec.md` 的 Acceptance Criteria 优先使用 EARS 语法：`WHEN <trigger> THE SYSTEM SHALL <behavior>`；复杂条件可补 `IF/WHILE/WHERE`。
 - 业务 capability 命名应尽量与限界上下文一致（kebab-case）；技术 capability 可按架构能力命名，但不得进入 `docs/domain/context-map.md`。
 - 若变更涉及下线能力，使用 `REMOVED Requirements` 并触发人工确认

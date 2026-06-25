@@ -124,3 +124,4 @@ After completing all artifacts, summarize:
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
 - If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next
+- Use EARS for acceptance criteria in `spec.md`: `WHEN <trigger> THE SYSTEM SHALL <behavior>`

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeReadFile": [
+      {
+        "command": "python .cursor/hooks/log_doc_usage.py",
+        "matcher": "Read",
+        "failClosed": false
+      }
+    ],
+    "afterEdit": [
+      {
+        "command": "python .cursor/hooks/drift_guard_scan.py",
+        "matcher": "Edit|Write|ApplyPatch|MultiEdit",
+        "failClosed": false
+      }
+    ]
+  }
+}

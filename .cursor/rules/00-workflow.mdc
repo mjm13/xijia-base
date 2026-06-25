@@ -1,225 +1,58 @@
 ---
-description: DDD + OpenSpec + Superpowers 的主流程规则与门禁
+description: xijia 研发宪法（精简版）：分级、路由、门禁与收尾
 alwaysApply: true
 ---
 
-# Change 分类
+# 核心定位
 
-每个 change 先判定类型，再决定文档深度。**禁止**把纯技术基建写成新的限界上下文。
+- 真相源：测试 > spec；代码与已发布文档共同构成事实。
+- 流程入口：优先 `/xijia:start`（`xijia-ops-pipeline`）；仅在明确场景使用单步命令。
+- 详细执行步骤放在技能中，本文件只保留必须长期生效的门禁。
+- 项目级硬约束以 `docs/constitution.md` 为准（由 init 生成）。
 
-| 类型 | 定义 | 示例 | 领域文档（`docs/domain`） | 主要文档 |
-| --- | --- | --- | --- | --- |
-| **业务 change** | 引入或变更业务能力、规则、术语、上下文边界 | 指标填报、审批流、权限模型 | 🔴 草稿写入 change 文件夹 `docs/openspec/changes/<name>/domain/`（context-map / ubiquitous-language / domain-model），归档后提升到 `docs/domain/*` | OpenSpec + domain |
-| **技术 change** | 工程骨架、横切能力、工具链、UI 壳层；无新业务规则 | `springboot-backend-skeleton`、`platform-shell`（布局 / 路由 / Design Token） | **不写入 `docs/domain` 的 context-map / domain-model / ubiquitous-language**；如影响业务能力，只在已有业务上下文中记录业务语义变化，不记录框架/布局实现 | OpenSpec `design.md` + ADR / `docs/architecture.md` / `docs/capability-map.md` |
-| **混合 change** | 既有基建又有业务规则 | 后端鉴权 + RBAC 策略 | 仅建模业务部分；基建写入 ADR / design | 两者兼有 |
+# 需求分级与路由
 
-**技术 change 识别信号**（满足多数即可归类为技术 change）：
-- 需求描述为「项目骨架 / 脚手架 / 初始化 / 升级依赖 / CI 模板」
-- OpenSpec capability 以 `project-structure`、`logging`、`health-monitoring` 等横切能力为主
-- 能力是 UI 壳层、布局、路由、Design Token、前端状态管理等平台支撑（如 `platform-shell`）
-- 不产生新的业务术语或聚合根
-- 主要交付物是可运行工程结构与通用中间件配置
+- 🟢 轻量：Plan Mode + 人审 + 执行；按需落 `docs/plans/`。
+- 🟡 中等：Plan Mode + 可选 Superpowers；必要时升档。
+- 🔴 核心：完整链路 `explore -> propose -> analyze -> apply -> verify -> sync -> archive -> sync-knowledge`。
+- 🧪 spike：链路不清时先探针，代码不得直接作为交付成果。
 
-# 需求分级（入口闸门，先分级再决定走多重的流程）
+# Change 类型门禁
 
-**禁止一刀切**：不是所有需求都进 OpenSpec 全管道。先按复杂度分档，再选流程。
+- 每个 change 必须先判定 `business|technical|hybrid`。
+- `technical`/UI 壳层不得虚构 DDD 领域模型。
+- `business`/`hybrid` 的业务术语需要可追溯到领域文档条目。
 
-| 档位 | 适用 | 流程 | 持久化 |
-| --- | --- | --- | --- |
-| 🟢 轻量 | 配置/文案/样式变更、简单 CRUD、独立前端页面 | **Plan Mode**：AI 出方案 → 人审 → 执行；不进 OpenSpec | 方案落 `docs/plans/`（值得留则留） |
-| 🟡 中等 | 单一上下文内常规功能、弱不变量 | **Plan Mode + 可选 Superpowers**（含可测逻辑时）；需沉淀领域知识则在收尾后直接写 `docs/domain/*` | 计划落 `docs/plans/`；必要时 ADR |
-| 🔴 核心 | 资金链路、权限模型、复杂业务规则、跨上下文、多聚合 | **完整 OpenSpec + Superpowers**（`openspec-superpowers-apply`） | OpenSpec specs + `docs/domain` |
+# 文档与知识边界
 
-**分级原则**：
-- 拿不准时**先降一档**，发现复杂度超预期再升档（升档成本远低于过度设计成本）
-- 改配置走 🟢，别写 40 分钟 Spec
-- 只有 🔴 才值得 OpenSpec 的持久化与同步成本；本项目无硬性审计需求，OpenSpec 仅服务核心业务的知识沉淀
+- 开发中领域草稿只写 `docs/openspec/changes/<name>/domain/`。
+- 仅在 `sync -> archive -> sync-knowledge` 后提升到 `docs/domain/*`。
+- `docs/domain/*` 只存已发布事实，作为 AI 读取现状的唯一领域真相源。
+- `docs/architecture.md`、`docs/capability-map.md` 仅允许在收尾阶段更新。
 
-**🧪 探针档（spike，正交于复杂度档）**：
-- 适用：链路严重不清、技术可行性未知、需求无法描述完整时，**先探路**
-- 性质：**一次性、可丢弃**的实验，目的只有两个——摸通端到端链路、把「未知」变成「可回答的问题」
-- 流程：走 🟢 的轻量节奏，方案与发现落 `docs/plans/<spike-name>.md`
-- 铁律：**spike 代码不得直接当成果交付**；探针结束后产出喂给正式 change（🟡/🔴）重做或重构
-- 退出条件：未知已澄清、链路已验证 → 升档为正式 change；或证实不可行 → 记录结论后丢弃
+# 收尾门禁（不得跳过）
 
-# 迭代切片（需求无法一次描述完时的默认姿态）
+1. verify：测试/构建有证据。
+2. 文档同步：🔴 走 `sync -> archive -> sync-knowledge`；🟢/🟡 完成等价同步。
+3. 验收记录：写入需求或计划文档（人工可复现）。
+4. commit：本需求代码与同步文档一起提交（由用户触发执行）。
 
-**现实：绝大部分需求无法一次描述完所有链路，也很难一次做完。** 因此默认按「纵向切片」推进，而非「一次做完整功能」。
+- 未完成第 1-4 步，不得开启下一需求。
+- “需求完成”的对外口径为：已达到可提交状态并已提醒用户执行 commit；若尚未 commit，必须明确为“待提交完成”。
+- 禁止“口头完成”，必须给出验证结果与未执行项。
 
-**三条心法：**
-1. **切片优先**：工作单元是「打通一条端到端链路的薄切片」，不是「完整模块/功能」。一个 OpenSpec change = 一个切片，**不是**一个模块。change 命名切片化（如 `identity-basic-ingest-from-hr`，而非 `identity-basic`）。
-2. **活文档增量**：`spec.md`、`data-dictionary.md`、`docs/domain/*` 都是活文档，随每个 change 逐次生长；第一版不全是正常的，靠 `archive → sync-knowledge` 循环长期累积。
-3. **显式未知**：想不清的链路**显式 park**，不塞进 design 假装确定。每个 proposal 必含三段（见「联动门禁」）：
-   - **In Scope**：本切片要打通的链路与 AC
-   - **Out of Scope**：明确不在本次范围内
-   - **Open Questions / Deferred**：尚未想清、需后续切片或 spike 解决的链路
+# Approval Gates（命中即暂停并请求确认）
 
-**与 AC 门禁的关系**：门禁只约束 **本切片的 In Scope AC**；标记为 `Deferred` 的 AC 不阻塞当前切片勾选完成（详见「真相源与冲突裁决」）。
-
-# 知识沉淀（与流程档位正交）
-
-**沉淀什么，与走多重的流程无关。** 即使是 🟢 改配置，只要命中下面三问，也必须沉淀（成本通常一行）。
-
-**沉淀三问（任一为「是」即沉淀）：**
-1. 是业务规则 / 不变量吗？（如「投标截止后不可撤回」「扣费不退款」）→ `docs/domain`（ubiquitous-language / domain-model）
-2. 是非显而易见的决策及其原因吗？→ `docs/decisions`（ADR）
-3. 是数据库 / 字段的业务语义、状态流转、约束理由吗？→ `docs/domain/data-dictionary.md`
-
-**不沉淀：**
-- 与代码重叠的实现细节——**代码即文档**，抄进 docs 必然漂移
-- 一次性琐碎改动
-- UI / 技术实现词不写入 DDD 统一语言或领域模型：如 `App Shell`、`MainLayout`、`Design Token`、`AuthStore`、框架类名、拦截器、具体鉴权库 API。它们应放在 `docs/architecture.md`、ADR、OpenSpec 技术 spec 或 `docs/capability-map.md`
-
-**数据库三层（结构与语义分离）：**
-- 结构真相 = 迁移脚本（可执行，不抄进 docs）
-- 实时读取 = 数据库 MCP（只读）
-- 业务语义 = 数据字典（字段业务含义、状态机、约束理由——DDL 里看不出的代码外知识）
-
-**能力追溯索引（按需求发布节点维护，三档通用）：**
-- `docs/capability-map.md` 是模块级薄索引，只记录「模块 / moduleKey / 前端入口 / 后端能力 / 相关表 / Demo」指针，不复制子菜单、路由明细或 DDL
-- 触发条件（任一命中即需更新）：新增/下线/重命名业务模块、变更前端 `moduleKey`、新增模块相关业务表、新增模块根路由
-- 维护节点按档位（发布即收尾）：
-  - 🔴：在 `sync-knowledge` 收尾时检查更新
-  - 🟢 / 🟡：在该需求完成、人确认收尾时直接检查更新（这两档不走 `sync-knowledge`，不得因此漏掉）
-- 数据表字段语义仍写 `data-dictionary.md`；表结构仍以迁移脚本为唯一真相
-
-**按需文档创建时机（硬门禁）：**
-- `docs/architecture.md`、`docs/capability-map.md` 仅允许在**需求收尾阶段**创建或更新（🔴 在 `sync-knowledge`，🟢/🟡 在完成收尾的文档同步步骤）
-- 开发进行中（explore/propose/apply/verify）不得创建上述文件；如需先记录判断，写入 change design / tasks / ADR 草案，待收尾再落库到 docs
-
-**AGENTS.md（活文档，分阶段增量、收尾更新）：**
-- `AGENTS.md` 的「代码结构与运行方式 / 项目信息」随真实进展增量生长，**仅在需求收尾阶段更新**，开发中不写
-- 触发条件（任一命中即在收尾更新）：新增/变更可运行结构（后端/前端骨架、目录布局）、运行/测试/构建命令变化、业务模块增减
-- 「入口路由 / 统一研发流水线」属静态基线，不随单个 change 改动
-- 典型分阶段：init 仅占位 → 后端骨架收尾补后端结构与运行方式 → 前端骨架收尾补前端 → 业务模块上线时更新项目信息并链接 `capability-map.md`
-
-**领域知识写入规则（`docs/domain` 只存已发布事实）：**
-- `docs/domain/*` 是 AI 读取「现状 / 已有功能」的**唯一真相源**；**AI 理解现状只读 `docs/domain`，不读任何 change 草稿**
-- 🔴（OpenSpec change 在飞行中）：领域草稿写入 change 文件夹 `docs/openspec/changes/<name>/domain/`；归档后由 `sync-knowledge` 提升到 `docs/domain/`，提升后草稿随 change 一并归档离场
-- 🟢 / 🟡（无 OpenSpec change，完成即既成事实）：人确认后**直接写 `docs/domain/`**
-- 任何未发布 / 在飞内容都不得进入 `docs/domain/*`
-- `docs/domain/*`（context-map / domain-model / ubiquitous-language / data-dictionary）按需创建：首个业务 change 收尾时若不存在则创建，init 阶段不预生成（仅留 `docs/domain/README.md`）
-
-# 主流程（🔴 档完整流水线；🟢🟡 见上表，到对应档位即停）
-
-当用户提出 🔴 核心需求时，执行以下流水线：
-
-1. `explore`：用 `/opsx:explore` 探索问题；**业务 change** 在 change 文件夹 `docs/openspec/changes/<name>/domain/` 起草领域条目，**技术 change** 跳过 domain 新建，必要时写 ADR 草案
-2. `propose`：用 `/opsx:propose` 生成 proposal/design/tasks
-3. `apply`：用 **openspec-superpowers-apply** 实现任务（OpenSpec 管 tasks 进度，Superpowers 管 TDD/验证/评审；禁止裸跑 apply）
-4. `verify`：执行测试、验证与代码评审
-5. `sync`：用 `/opsx:sync` 同步 delta specs 到主 specs
-6. `archive`：用 `/opsx:archive` 归档 change
-7. `sync-knowledge`：以需求发布为节点，将有效知识回灌 docs 与 ADR，并检查 `capability-map.md` / `data-dictionary.md`（技术 / UI 壳层 change 以 ADR、架构文档、能力索引为主，不回灌伪领域条目）
-
-# 文档状态模型
-
-- 需求：`inbox -> in-change(<name>) -> shipped/dropped`
-- 领域条目：`change 草稿（docs/openspec/changes/<name>/domain）-> docs/domain`
-- ADR：`proposed -> accepted -> superseded/deprecated`
-
-**需求文档物理位置随状态迁移**（frontmatter `status` 与目录必须一致）：
-
-| status | 目录 | 说明 |
-| --- | --- | --- |
-| `inbox` / `in-change` | `docs/requirements/inbox/` | 待办与进行中，统一留在 inbox |
-| `shipped` | `docs/requirements/shipped/` | 完成后**移入**，不与 inbox 混放 |
-| `dropped` | `docs/requirements/dropped/` | 放弃后**移入**（目录不存在则创建） |
-
-- 迁移用 `git mv` 保留历史；移动后用 Grep 检查并修正引用该路径的其他文档（plans/ADR/README 等），避免死链
-- `docs/requirements/requirements-template.md` 始终留在 `requirements/` 根，不参与迁移
-
-# 联动门禁
-
-- 每个 change 建议先建立独立 worktree 与分支 `change/<name>`
-- 初始化完成判定需通过 `05-project-init.mdc` 的 self-check，并通过 `06-rule-drift-guard.mdc` 的漂移扫描
-- propose 前必须在 proposal 中标注 change 类型（业务 / 技术 / 混合）
-- propose 前统一语言：**业务 / 混合 change 的业务术语**必须具备 `ubiquitous-language` 条目；**技术 / UI 壳层 change** 不写入 DDD 统一语言，除非该术语会成为业务人员也使用的领域语言
-- **proposal 必含范围三段**：`In Scope` / `Out of Scope` / `Open Questions & Deferred`。想不清的链路写进第三段显式 park，禁止塞进 design 假装确定
-- apply 前 design 必须包含：
-  - **业务 / 混合 change**：领域设计小节 + 分层裁剪决策
-  - **技术 change**：技术方案小节（栈选型、目录结构、横切能力清单）+ 分层裁剪决策；**不要求**虚构领域模型
-- 技术 / UI 壳层 change 的关键决策写入 `docs/decisions/`（ADR）、`docs/architecture.md` 或 `docs/capability-map.md`，不写 `context-map` 新 context，也不在 `domain-model.md` 虚构无聚合的模型
-- 开发中的领域草稿只写入 change 文件夹 `docs/openspec/changes/<name>/domain/`；仅在 `sync -> archive -> sync-knowledge` 后提升到 `docs/domain/*`
-- 收尾仅两条路径：
-  - 完成：`sync -> archive -> sync-knowledge`；收尾时检查能力追溯索引、数据字典与必要 ADR，**输出「人工验收说明」**，将需求 `status` 置 `shipped` 并 `git mv` 到 `docs/requirements/shipped/`
-  - 放弃：`abandon-change`；收尾时将需求 `status` 置 `dropped` 并 `git mv` 到 `docs/requirements/dropped/`
-- 🟢 / 🟡 收尾同样必须**输出「人工验收说明」**（见下方专节）
-- 未归档 change 不得写入 `docs/domain/*`（已发布事实）
-
-# 需求收尾门禁（提交为最终操作）
-
-**一个需求以 `git commit` 为最终操作。** 在代码与文档同步全部完成、且**已成功提交**之前，不得宣告该需求完成，**不得**启动下一个需求的 propose / apply。
-
-## 收尾顺序（强制）
-
-对当前需求，按序执行，**末步必须是 commit**：
-
-1. **verify**：测试/构建通过（有命令输出证据）
-2. **文档同步**（🔴：`sync → archive → sync-knowledge`；🟢/🟡：计划/需求 AC、capability-map、数据字典等该写的写完）；命中触发条件时一并更新活文档 `AGENTS.md`（代码结构 / 运行方式 / 项目信息）
-3. **需求状态**：`# 验收记录` 已写入；`status: shipped`（或 `dropped`）；物理路径与 status 一致（`shipped/` 或 `dropped/`）
-4. **git commit**：将本需求相关的**代码 + 已同步文档**一次性提交；commit message 聚焦「为什么」
-5. **（可选）push**：仅当用户明确要求
-
-## 进入下一需求的条件
-
-仅当以上 1–4 全部满足（尤其 **commit 已成功**）后，才可：
-
-- 在 inbox 中启动**下一个**需求的 `propose` / `in-change`
-- 或应用户要求「继续下一个需求」
-
-**禁止**：实现/测试通过但未 commit 就 archive、移 shipped、或开始下一需求。
-
-## AI 执行约束
-
-- 不得将「Implementation Complete / 收尾完成」作为对用户的首个完成信号；必须先完成 commit（或明确 blocked 并列出未提交文件）
-- 用户说「开始下一个需求」时：先 `git status`；若仍有上一需求的未提交改动，**先完成上一需求的 commit**，再进入下一需求
-- 每个需求 ideally **一个 commit**；同一需求多切片可多个 commit，但**下一需求开始前**当前需求链必须全部 commit
-
-# 真相源与冲突裁决（测试 > Spec）
-
-Spec/design 是自然语言意图，没有裁判机制；测试可执行、有 pass/fail。两者冲突时：
-
-- **实现期以测试为准**：任务完成与否由验证/测试裁决，不由 Spec 自洽与否裁决
-- **测试暴露 Spec 错误时不得静默跳过**：暂停 → 先改 `design.md`/spec → 再继续实现
-- **Spec 只锁 What，不锁 How**：边界、不变量、验收标准（AC）该写死；技术选型、实现路径、代码结构交给模型，给信息而非指令
-- 每条验收标准（AC）应能对应到测试；🔴 档 AC 无对应测试不得勾选任务
-- **AC 门禁只约束「本切片 In Scope 的 AC」**：标记为 `Deferred` / `Out of Scope` 的 AC 不阻塞当前切片完成；「本切片没做完」是合法状态，留给后续切片，而非违规
-
-# 人工验收说明（每次收尾必产出，三档通用）
-
-**问题：交给 AI 编码后，人往往不知道改了哪些东西、从哪验起。** 因此**任何档位**的需求收尾时，AI 必须输出一段「人工验收说明」，让人能脱离代码、按场景点验。**禁止只说「已完成、测试通过」就收尾。**
-
-**落地位置（必须持久化，不能只在聊天里说）：**
-- 追加到对应需求文件的 `# 验收记录` 段：`docs/requirements/inbox/<req>.md`（完成后随状态迁移到 `shipped/`）
-- 若该需求未走 OpenSpec（🟢/🟡）只有 `docs/plans/` 计划文档，则追加到该计划文档
-- 多切片场景**追加不覆盖**：每个切片一条记录，保留历史
-- 同时在收尾摘要里复述一份，方便当场验收
-
-**验收说明模板（写入需求文件的 `# 验收记录`，并在收尾摘要中复述）：**
-
-```markdown
-## 人工验收说明（Acceptance Note）
-
-- 涉及菜单 / 模块：<moduleKey + 菜单路径，如 identity-permission → /identity/permission；无界面则写「后端 API / 无界面」>
-- 改了什么功能：<一句话能力描述>
-- 验收场景（人可复现）：
-  1. GIVEN <前置> WHEN <操作> THEN <可观察结果>
-  2. ...
-- 手动验证步骤：<点哪个菜单、输入什么、预期看到什么；后端给 curl/接口示例与预期响应>
-- 自动化覆盖：<对应测试名 / 验证命令>；未覆盖的标注「需人工点验」
-- 本次范围外 / Deferred：<明确列出本切片未做的链路，对齐 proposal 的 Open Questions>
-```
-
-**要点：**
-- 必须点名 **改了哪个菜单/模块（moduleKey）、什么功能、什么场景**——这是人工验收的最小信息集
-- 验收场景与 `Out of Scope / Deferred` 必须如实，未做的不许写成已做
-- 🔴 在 `openspec-superpowers-apply` 完成模板中输出；🟢/🟡 在 Plan Mode 执行收尾时输出
-
-# Approval Gates（必须暂停并请求用户确认）
-
-- 破坏性数据库变更（删表/删列/改类型/数据回填）
-- 新增关键外部依赖（三方 API、外部服务、核心包）
+- 破坏性数据库变更（删表/删列/改类型/回填）
+- 新增关键外部依赖（第三方 API/核心包）
 - 删除或下线已上线能力
-- 权限、密钥、安全策略相关变更
-- 跨限界上下文的大规模架构调整
+- 权限、密钥、安全策略变更
+- 跨限界上下文大规模架构调整
+
+# 关联规则（按需加载）
+
+- 证据链与影响边界：`40-evidence-chain.mdc`
+- 变更边界：`41-change-boundary.mdc`
+- 验证输出：`42-verification-output.mdc`
+- 纠错学习：`43-correction-learning.mdc`
+- 注释同步：`44-comment-sync.mdc`

@@ -8,11 +8,16 @@ description: Implement tasks from an OpenSpec change (Experimental)
 Implement tasks from an OpenSpec change.
 
 > **本项目优先用 `openspec-superpowers-apply`（实现阶段唯一推荐入口）。**
-> `/opsx:apply` 是底层裸跑入口，不强制 TDD/验证/评审门禁。除非你明确只想跟踪 OpenSpec 任务进度而不加载 Superpowers，否则请改说「开始实现」以触发 `openspec-superpowers-apply`。详见 `.cursor/rules/00-workflow.mdc`。
+> `/opsx:apply` 是底层裸跑入口，不强制 TDD/验证/评审门禁。默认重定向到 `openspec-superpowers-apply`。仅当用户明确声明“裸跑 apply / 不加载 superpowers”时才继续本命令。
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
+
+0. **Guard: redirect by default**
+
+   - 若用户未明确要求“裸跑 apply”，立即改走 `openspec-superpowers-apply` 并停止本命令后续步骤。
+   - 仅在用户显式确认裸跑时继续。
 
 1. **Select the change**
 

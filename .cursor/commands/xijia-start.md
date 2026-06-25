@@ -29,7 +29,7 @@ The argument after `/xijia:start` can be:
 - Always follow `.cursor/rules/00-workflow.mdc`
 - Always invoke and follow `xijia-ops-pipeline`
 - Do not skip tiering or change type classification
-- For red tier, do not skip OpenSpec + Superpowers chain
+- For red tier, do not skip OpenSpec + analyze + Superpowers chain
 - Do not mark complete without closure checks defined by `xijia-ops-pipeline`
 
 ## Output format
@@ -41,7 +41,7 @@ Always return a concise status block:
 
 - Tier: <green|yellow|red>
 - Change Type: <business|technical|hybrid>
-- Stage: <explore|propose|apply|verify|sync|archive|sync-knowledge|abandon>
+- Stage: <explore|propose|analyze|apply|verify|sync|archive|sync-knowledge|abandon>
 - Done: <what completed>
 - Next: <next command/skill>
 - Blockers: <none or list>

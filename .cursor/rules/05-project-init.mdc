@@ -1,6 +1,5 @@
 ---
-description: 空仓库初始化规则（xijia:init / xijia-project-init）
-alwaysApply: true
+description: 空仓库初始化规则（仅在初始化意图时启用）
 ---
 
 # 初始化路由规则
@@ -50,6 +49,7 @@ alwaysApply: true
 # 初始化交付最小集（必须包含）
 
 - `AGENTS.md`
+- `docs/constitution.md`
 - `docs/README.md`
 - `docs/decisions/0001-project-bootstrap.md`
 - `docs/domain/README.md`

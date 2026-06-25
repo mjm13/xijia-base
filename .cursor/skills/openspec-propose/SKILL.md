@@ -112,3 +112,4 @@ After completing all artifacts, summarize:
 - **切片化命名**：change 名称对应「一条端到端薄切片」，不是整个模块（如 `identity-basic-ingest-from-hr` 而非 `identity-basic`）
 - **proposal 必含范围三段**：`In Scope` / `Out of Scope` / `Open Questions & Deferred`。想不清的链路写进第三段显式 park，禁止塞进 design 假装确定（见 `.cursor/rules/00-workflow.mdc`「迭代切片」）
 - proposal 必须标注 change 类型（business / technical / hybrid）
+- `spec.md` 的验收标准使用 EARS 语法：`WHEN <trigger> THE SYSTEM SHALL <expected behavior>`；必要时补 `WHILE/IF/WHERE` 约束

@@ -1,6 +1,8 @@
 ---
 description: 规则漂移检测（防止回流到栈绑定术语）
-alwaysApply: true
+globs:
+  - ".cursor/rules/**/*.mdc"
+  - ".cursor/skills/**/*.md"
 ---
 
 # 目标

@@ -11,6 +11,9 @@ metadata:
 
 Implement tasks from an OpenSpec change.
 
+> In xijia-base, this is a low-level fallback. Prefer `openspec-superpowers-apply`.
+> Only run this skill when the user explicitly requests bare apply without Superpowers gates.
+
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**

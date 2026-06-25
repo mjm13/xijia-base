@@ -24,6 +24,8 @@ description: 归档后知识回灌（spec/change -> docs/domain + ADR + capabili
 6.5. 检查 `AGENTS.md`（活文档）：当本 change 引入/变更可运行结构（后端/前端骨架、目录布局）、运行/测试/构建命令，或业务模块增减时，更新 `AGENTS.md` 的「代码结构与运行方式 / 项目信息」；路由与流水线区块保持不动
 7. 如有架构或流程决策，新增 ADR
 8. 若发现设计与实现偏差，记录待修正事项
+8.5. 执行轻量代码↔文档漂移检查：对照本次 delta spec 的 capability/AC 与 `docs/domain/*`、`docs/capability-map.md` 已同步条目，列出缺口并当场补齐或标注 `deferred`
+8.6. 运行 `xijia-docs-score`（`python .cursor/skills/xijia-docs-score/scripts/score_docs.py`）更新文档使用价值报告，将低价值/误导候选作为“后续修订清单”（不自动删除）
 9. 将对应需求 `status` 置 `shipped`，并用 `git mv` 移到 `docs/requirements/shipped/`；移动后 Grep 修正引用该路径的文档，避免 dead 链
 10. **提醒**：`sync-knowledge` 之后还必须 **git commit**（本需求最终操作），见 `00-workflow.mdc`「需求收尾门禁」；未 commit 不得开始下一需求
 
