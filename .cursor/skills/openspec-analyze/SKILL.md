@@ -1,46 +1,26 @@
----
+﻿---
 name: openspec-analyze
-description: 在实现前做 OpenSpec 产物一致性闸门检查（AC↔tasks↔spec↔test）。
+description: 在实现前做 OpenSpec 一致性闸门（AC↔tasks↔spec↔test↔DDD契约）。
 ---
 
 # OpenSpec Analyze
 
-## 目标
-
-在 `propose -> apply` 之间执行一次一致性检查，避免“有 spec 无任务”或“有任务无验收/测试”。
-
-## 检查范围
-
-对当前 change 的以下文件建立追溯表：
-
-- `proposal.md`：`In Scope` / `Out of Scope` / `Open Questions & Deferred`
-- `design.md`：关键约束与技术方案
-- `tasks.md`：可执行任务清单
-- `specs/**/spec.md`：Requirement / Acceptance Criteria
-
 ## 必查项
 
-1. 每条 `In Scope` AC 都能映射到至少一条任务（`tasks.md`）。
-2. 每条 `In Scope` AC 都能在 delta `spec.md` 找到对应 Requirement/AC。
-3. 每条 `In Scope` AC 都有验证路径（自动化测试或可执行检查）。
-4. 标记为 `Deferred`/`Out of Scope` 的项不得混入当前任务完成判定。
-5. 若发现冲突（spec 与 design/tasks 不一致），先修产物再实现。
+1. In-Scope AC ↔ tasks 映射完整。
+2. In-Scope AC ↔ delta spec 映射完整。
+3. In-Scope AC ↔ tests/checks 映射完整。
+4. DDD 契约完整：
+   - UL 含 BC + Aliases to AVOID
+   - domain-model 含 `INV-xxx`
+   - context-map 含关系 Pattern
+5. `Deferred/Out of Scope` 不进入完成判定。
 
-## 输出格式
+## 校验命令
 
-```markdown
-## OpenSpec Analyze
+- `python .cursor/skills/ddd-modeling/scripts/validate_domain_contracts.py --path "<change-domain-dir>"`
 
-- Change: <name>
-- Verdict: <ready | blocked>
-- Coverage:
-  - In-Scope AC: <N>
-  - Mapped to tasks: <N/N>
-  - Mapped to specs: <N/N>
-  - Mapped to tests/checks: <N/N>
-- Blocking Gaps:
-  - AC-xxx -> missing in tasks/spec/test ...
-- Next:
-  - ready: use `openspec-superpowers-apply`
-  - blocked: update artifacts then re-run `/opsx:analyze`
-```
+## Verdict
+
+- `ready`: 所有映射与契约校验通过
+- `blocked`: 任一缺口未闭合

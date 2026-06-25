@@ -1,9 +1,16 @@
-# Context Map（Established）
+﻿# Context Map（Established）
 
-## 初始上下文
+## Bounded Contexts
 
-- {{primary_modules}}
+- <context-a>
+- <context-b>
 
-## 上下文关系
+## Relationship Matrix
 
-- 待首个业务切片归档后补充
+| Upstream | Downstream | Pattern | Contract |
+| --- | --- | --- | --- |
+| <context-a> | <context-b> | OHS/ACL/Conformist/Partnership | <semantic-contract> |
+
+## Notes
+
+- 上下文关系必须明确集成模式（Pattern），禁止仅写“调用关系”。

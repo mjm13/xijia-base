@@ -1,17 +1,22 @@
-# Domain Docs
+﻿# Domain Docs
 
 本目录沉淀**已发布的领域知识**，是 AI 理解“现状 / 已有功能”的唯一真相源。
 
-## 文件（按需创建，init 阶段不预生成）
+## 推荐目录组织（按 BC）
 
-- `context-map.md`：限界上下文与上下游关系
-- `domain-model.md`：聚合、不变量、状态机、领域事件
-- `ubiquitous-language.md`：业务术语与锚点
-- `data-dictionary.md`：字段业务语义、状态机、约束理由
+- `docs/domain/<bc>/ubiquitous-language.md`
+- `docs/domain/<bc>/domain-model.md`
+- `docs/domain/<bc>/aggregate-spec.md`
+- `docs/domain/<bc>/anti-corruption-layer.md`
+- `docs/domain/context-map.md`（系统级）
+- `docs/domain/data-dictionary.md`（系统级）
 
-**AI 读取现状只读本目录**，不读任何 change 草稿。
+## 读取纪律（just-in-time）
+
+- 优先按当前任务 BC 读取对应目录，不整包加载 `docs/domain/**`。
+- 只有跨 BC 分析时，才补读 `context-map.md`。
 
 ## 开发中的领域草稿在哪
 
-- 🔴 OpenSpec change：草稿写在对应 change 文件夹 `docs/openspec/changes/<name>/domain/`，归档后由 `sync-knowledge` 提升到本目录，草稿随 change 离场
-- 🟢 / 🟡 无 change：人确认后直接写本目录
+- 🔴 OpenSpec change：草稿写在 `docs/openspec/changes/<name>/domain/`，归档后由 `sync-knowledge` 提升到本目录。
+- 🟢 / 🟡 无 change：人确认后直接写本目录。

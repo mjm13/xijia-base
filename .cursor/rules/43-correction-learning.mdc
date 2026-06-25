@@ -1,5 +1,5 @@
----
-description: 用户纠正学习（验码后沉淀到知识文档）
+﻿---
+description: 用户纠正学习（验码后沉淀到知识文档与记忆）
 ---
 
 # 触发条件
@@ -9,12 +9,9 @@ description: 用户纠正学习（验码后沉淀到知识文档）
 # 执行要求
 
 1. 先用代码或文档证据验证纠正内容。
-2. 验证成立后，将有效知识**追加**写入对应文档（不覆盖历史）：
-   - `docs/domain/ubiquitous-language.md`
-   - `docs/domain/domain-model.md`
-   - `docs/domain/context-map.md`
-   - `docs/domain/data-dictionary.md`
-   - 或相关 ADR/计划文档
+2. 验证成立后：
+   - 追加写入 `docs/memory/decisions.jsonl`（episodic 记忆）
+   - 并将稳定语义追加到 `docs/domain/*` 或 ADR/计划文档（不覆盖历史）
 3. 每次沉淀需附最小证据摘要：入口/契约/执行点/数据落点。
 4. 无法闭环验证时标记 `[待确认]`，不得作为已确认事实写入。
 
@@ -24,6 +21,7 @@ description: 用户纠正学习（验码后沉淀到知识文档）
 纠错学习记录：
 - 用户纠正：...
 - 验证证据：入口... / 契约... / 执行点... / 数据落点...
-- 归档去向：docs/domain/... 或 docs/decisions/...
+- 记忆写回：docs/memory/decisions.jsonl
+- 知识去向：docs/domain/... 或 docs/decisions/...
 - 状态：confirmed | 待确认
 ```
