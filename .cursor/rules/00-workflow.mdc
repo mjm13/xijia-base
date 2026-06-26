@@ -12,6 +12,9 @@ alwaysApply: true
 
 # 需求分级与路由
 
+- Gate-0（需求完整性闸门）先于分级执行：必须先判定 `complete|partial|reject`（详见 `45-requirement-intake.mdc`）。
+- 分级结论必须附“分级理由”：逐条说明 red 触发器（核心业务 / 复杂规则 / 跨限界上下文）命中或未命中。
+- 分级理由建议使用 Tier Decision Matrix（命中项 + 证据 + 置信度），矩阵规则在 `xijia-ops-pipeline` 维护。
 - 🟢 轻量：Plan Mode + 人审 + 执行；按需落 `docs/plans/`。
 - 🟡 中等：Plan Mode + 可选 Superpowers；必要时升档。
 - 🔴 核心：完整链路 `explore -> propose -> analyze -> apply -> verify -> sync -> archive -> sync-knowledge`。
@@ -19,10 +22,13 @@ alwaysApply: true
 
 # 人审门禁（硬停，不得自动跳过）
 
-1. Gate-1（实现前批准）：
+1. Gate-0（需求完整性闸门）：
+   - 分级前必须完成完整性判定：`complete|partial|reject`。
+   - `partial`/`reject` 必须先向用户报告可落地范围与缺失清单，获得确认后才可继续。
+2. Gate-1（实现前批准）：
    - 完成方案/计划后必须停止并请求用户批准。
    - 未获批准前，禁止修改任何非文档代码、迁移、依赖与配置。
-2. Gate-2（验收签字与状态迁移）：
+3. Gate-2（验收签字与状态迁移）：
    - 勾选验收标准、需求状态迁移（如 inbox -> shipped）、change 归档前，必须先获得用户人工验收确认。
    - Agent 只能提请验收，不得自行标记“已完成”或自动归档。
 
@@ -31,6 +37,8 @@ alwaysApply: true
 - 每个 change 必须先判定 `business|technical|hybrid`。
 - `technical`/UI 壳层不得虚构 DDD 领域模型。
 - `business`/`hybrid` 的业务术语需要可追溯到领域文档条目。
+- `technical` 需求必须使用 `docs/requirements/technical-requirement-template.md` 必填项（SLO/可靠性/安全/回滚/兼容/可观测）。
+- 技术实现细节不得写入 `docs/domain/*`；关键技术权衡必须沉淀至 `docs/decisions/*`（ADR）。
 
 # 文档与知识边界
 
@@ -42,12 +50,14 @@ alwaysApply: true
 # 收尾门禁（不得跳过）
 
 1. verify：测试/构建有证据。
-2. 文档同步：🔴 走 `sync -> archive -> sync-knowledge`；🟢/🟡 完成等价同步。
-3. 验收记录：写入需求或计划文档（人工可复现）。
-4. Gate-2：用户人工验收签字后，方可状态迁移/归档。
-5. commit：本需求代码与同步文档一起提交（由用户触发执行）。
+2. 注释同步：若本次新增或修改核心业务代码（API 端点、Service/业务处理单元、跨模块编排），必须调用 `xijia-comment-enhancer` 按端点层/内部层补全语义注释（先内部层再端点层）；纯文档/配置/样式改动可跳过并说明原因（详见 `44-comment-sync.mdc`）。
+3. 文档同步：🔴 走 `sync -> archive -> sync-knowledge`；🟢/🟡 完成等价同步。
+4. 验收记录：写入需求或计划文档（人工可复现）。
+5. Gate-2：用户人工验收签字后，方可状态迁移/归档。
+6. commit：本需求代码与同步文档一起提交（由用户触发执行）。
+7. 对 `partial/reject` 产出的 Deferred 项，必须写入 `docs/requirements/backlog.md` 后方可收尾。
 
-- 未完成第 1-5 步，不得开启下一需求。
+- 未完成第 1-6 步，不得开启下一需求。
 - “需求完成”的对外口径为：已达到可提交状态并已提醒用户执行 commit；若尚未 commit，必须明确为“待提交完成”。
 - 禁止“口头完成”，必须给出验证结果与未执行项。
 
@@ -66,3 +76,4 @@ alwaysApply: true
 - 验证输出：`42-verification-output.mdc`
 - 纠错学习：`43-correction-learning.mdc`
 - 注释同步：`44-comment-sync.mdc`
+- 需求完整性：`45-requirement-intake.mdc`

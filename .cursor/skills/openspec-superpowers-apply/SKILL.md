@@ -11,22 +11,27 @@ description: OpenSpec apply 与 Superpowers 强制联动实现入口（含 quali
 
 1. `openspec-apply-change`
 2. `test-driven-development`
-3. `systematic-debugging`（失败时）
-4. `verification-before-completion`
-5. `requesting-code-review`
-6. `quality-judge`（新增，最终门禁）
+3. `backend-test` / `frontend-test`（按触达栈二选一或都用）
+4. `systematic-debugging`（失败时）
+5. `xijia-comment-enhancer`（verify 阶段：若触达核心业务代码，见 `44-comment-sync.mdc`）
+6. `verification-before-completion`
+7. `requesting-code-review`
+8. `quality-judge`（新增，最终门禁）
 
 ## 执行步骤（简版）
 
 1. 读取 change 上下文（proposal/design/tasks/spec）。
 2. 建立 AC↔Test 追溯表；In-Scope AC 必须映射测试。
-3. 按任务循环：TDD -> 实现 -> 验证 -> 勾选。
-4. 全任务完成后执行：
+3. 按触达栈启用测试门禁（后端优先 `backend-test`，前端优先 `frontend-test`）。
+4. 按任务循环：TDD -> 实现 -> 验证 -> 勾选。
+5. 全任务完成后执行：
+   - 若触达核心业务代码：`xijia-comment-enhancer`（先内部层再端点层）
+   - `verification-before-completion`（含注释同步检查）
    - code-review
    - quality-judge（输出 `pass|revise`）
    - 人工验收说明
    - sync -> archive -> sync-knowledge
-5. commit 由用户触发；未 commit 不得进入下一需求。
+6. commit 由用户触发；未 commit 不得进入下一需求。
 
 ## 质量门禁
 

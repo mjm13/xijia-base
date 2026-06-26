@@ -22,6 +22,19 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+If critical unknowns block decomposition (e.g., data source undefined, prototype mismatch unresolved, acceptance shape unclear), do NOT force a fake implementation plan. Create a short **spike task block** first and mark implementation tasks as blocked until spike evidence is available.
+
+### Spike-first rule for plans
+
+- Detect unknowns early during scope/file-structure pass.
+- Add a dedicated pre-task:
+  - Goal
+  - Timebox
+  - Minimal experiments
+  - Evidence expected
+  - Exit criteria (`continue` / `partial` / `reject`)
+- Only then create implementation tasks for confirmed scope.
+
 ## File Structure
 
 Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.

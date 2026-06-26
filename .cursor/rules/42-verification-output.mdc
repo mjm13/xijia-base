@@ -13,8 +13,9 @@ alwaysApply: true
 2. 无法执行的验证项必须写明：未执行 + 原因 + 替代检查。
 3. 业务逻辑变更必须有自动化验证（测试或可执行检查）。
 4. 优先调用 `verification-before-completion` 技能执行收尾验证。
-5. 需给出 `quality-judge` 判定（`pass|revise`）。
-6. 若本次涉及 memory 写入（`docs/memory/decisions.jsonl`），收尾必须运行 `python .cursor/skills/xijia-memory/scripts/memory_lint.py` 并报告结果（未 init 项目 SKIP 视为通过）。
+5. 若触达核心业务代码，verify 阶段必须调用 `xijia-comment-enhancer`（见 `44-comment-sync.mdc`）。
+6. verify 阶段需给出 `Code Review` 结果（done 或 skipped+reason）。
+7. 需给出 `quality-judge` 判定（`pass|revise`），`revise` 不得宣告完成。
 
 # 输出模板
 
@@ -35,9 +36,16 @@ alwaysApply: true
 - 已执行：...
 - 结果：...
 
-Memory 校验（涉及 memory 写入时）：
-- 已执行：python .cursor/skills/xijia-memory/scripts/memory_lint.py
-- 结果：PASS|SKIP|FAIL
+Comment Sync：
+- 触达核心业务代码：yes|no
+- 已执行：xijia-comment-enhancer | skipped
+- 文件清单 / 跳过原因：...
+- 结果：done|blocked
+
+Code Review：
+- 已执行：requesting-code-review | skipped
+- 结果：done|skipped
+- 备注：...
 
 Quality Judge：
 - verdict: pass|revise

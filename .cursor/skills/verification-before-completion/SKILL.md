@@ -137,3 +137,35 @@ From 24 failure memories:
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
+
+## Spike-Specific Verification
+
+If this requirement used a spike/probe phase, completion claims must additionally verify:
+
+1. Spike hypotheses have explicit outcomes (true/false/partial)
+2. Claimed scope matches spike-backed executable scope
+3. Deferred items from spike remain deferred (not silently implemented)
+4. Any redesign caused by spike is reflected in requirements/plan docs
+
+Without these checks, do not claim “complete”.
+
+## Comment Sync Verification
+
+If this change touched core business code (API endpoints, services, cross-module orchestration), completion claims must additionally verify:
+
+1. `xijia-comment-enhancer` was invoked per `44-comment-sync.mdc`
+2. Internal layer comments completed before endpoint layer (bottom-up)
+3. Endpoint/internal dimensions not mixed; no generic template phrases
+4. Output includes `Comment Sync: done — <file list>` or valid `skipped — <reason>`
+
+If core business code was touched and comment sync was not done, do not claim “complete”.
+
+## Quality Judge Verification
+
+Before claiming completion at closeout, additionally verify:
+
+1. `quality-judge` has been executed in this cycle
+2. Verdict is explicitly recorded as `pass|revise`
+3. If verdict is `revise`, required fixes are applied and verify is rerun
+
+If `quality-judge` is missing or still `revise`, do not claim “complete”.

@@ -1,10 +1,11 @@
 # 文档索引（Docs Index）
 
-本目录承载 {{project_name}} 的需求、方案、规格、决策与领域知识沉淀。
+本目录承载 **{{project_name}}** 的需求、方案、规格、决策与领域知识沉淀。
 
 ## 核心目录职责
 
 - `requirements/`：记录“要做什么 + 如何验收”（需求入口与状态流转）
+- `requirements/backlog.md`：沉淀 Gate-0 `partial/reject` 与收尾 Deferred 项的统一任务池
 - `plans/`：承载 🟢/🟡 需求计划、spike 发现与人工验收说明
 - `openspec/`：承载 🔴 核心需求的规格驱动变更（proposal/design/tasks/spec）
 - `decisions/`：ADR，记录“为什么这样决策”
@@ -17,6 +18,7 @@
 3. 若为 🔴，变更产物落 `openspec/changes/`
 4. 涉及关键权衡时，补充 `decisions/`（ADR）
 5. 需求归档后，把稳定业务语义回灌 `domain/`
+6. 若本次存在 Deferred，先写入 `requirements/backlog.md` 再收尾
 
 ## 分档路由
 

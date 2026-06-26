@@ -79,6 +79,42 @@ Depending on what the user brings, you might:
 
 You have full context of the OpenSpec system. Use it naturally, don't force it.
 
+## Spike Mode（链路不清时）
+
+When requirements are unclear, data sources are missing, or prototype-vs-implementation decisions are under-specified, run exploration as a **spike** before implementation.
+
+### Trigger signals
+
+- Requirement only names modules but omits key behavior details
+- No credible data source path (API / external system / manual input)
+- Prototype exists but intended deviations are not explicitly confirmed
+- Critical unknown blocks tiering or task decomposition
+
+### Required spike output (concise report)
+
+```text
+Spike Report:
+- Problem: <what is unclear>
+- Hypotheses:
+  - H1: ...
+  - H2: ...
+- Experiments:
+  - E1: <minimal check> -> <evidence>
+  - E2: <minimal check> -> <evidence>
+- Findings:
+  - H1: true|false|partial
+  - H2: true|false|partial
+- Decision:
+  - Recommended path: green|yellow|red|reject
+  - Scope now executable: ...
+  - Deferred / needs user confirmation: ...
+```
+
+### Guardrail
+
+- Spikes produce **evidence and decisions**, not production implementation.
+- If spike results are inconclusive, explicitly return `blocked` and ask for user clarification.
+
 ### Check for context
 
 At the start, quickly check what exists:

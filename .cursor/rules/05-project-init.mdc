@@ -53,9 +53,9 @@ description: 空仓库初始化规则（仅在初始化意图时启用）
 - `docs/README.md`
 - `docs/decisions/0001-project-bootstrap.md`
 - `docs/domain/README.md`
-- `docs/memory/README.md`
-- `docs/memory/decisions.jsonl`（空 JSONL，init scaffold 创建；base 模板仓不预置）
 - `docs/requirements/requirements-template.md`
+- `docs/requirements/technical-requirement-template.md`
+- `docs/requirements/backlog.md`
 - `docs/plans/README.md`
 - `docs/openspec/config.yaml`
 

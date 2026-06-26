@@ -10,8 +10,8 @@ REQUIRED = ("ts", "source", "decision", "result", "confidence")
 
 def main() -> int:
     if not PATH.exists():
-        print("memory_lint: SKIP (not initialized; expected for base template repo)")
-        return 0
+        print("memory_lint: file not found")
+        return 1
     errors = 0
     for idx, line in enumerate(PATH.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():

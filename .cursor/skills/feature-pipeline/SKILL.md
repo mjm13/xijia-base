@@ -17,7 +17,7 @@ description: 端到端功能研发编排入口（DDD + OpenSpec + Superpowers）
 
 ## 一句话流程（速记，细节看 xijia-ops-pipeline）
 
-`分级(🟢🟡🔴，链路不清先🧪spike探路) → 判型(业务/技术/混合) → Gate-1(实现前必须 STOP 待用户批准) → 🔴: explore → propose → analyze → openspec-superpowers-apply → verify → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行；收尾 Gate-2(人工验收签字后方可状态迁移/归档)`
+`Gate-0(需求完整性: complete|partial|reject) → 分级(🟢🟡🔴，链路不清先调用 spike-probe) → 判型(业务/技术/混合) → Gate-1(实现前必须 STOP 待用户批准) → 🔴: explore → propose → analyze → openspec-superpowers-apply → verify(含 xijia-comment-enhancer / requesting-code-review / quality-judge) → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行(TDD + backend/frontend test)→verify(含注释同步 + quality-judge)；收尾 Gate-2(人工验收签字后方可状态迁移/归档)`
 
 > 实现阶段唯一入口：`openspec-superpowers-apply`（禁止裸跑 `openspec-apply-change`）。
 >
