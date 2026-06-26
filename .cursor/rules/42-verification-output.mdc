@@ -14,6 +14,7 @@ alwaysApply: true
 3. 业务逻辑变更必须有自动化验证（测试或可执行检查）。
 4. 优先调用 `verification-before-completion` 技能执行收尾验证。
 5. 需给出 `quality-judge` 判定（`pass|revise`）。
+6. 若本次涉及 memory 写入（`docs/memory/decisions.jsonl`），收尾必须运行 `python .cursor/skills/xijia-memory/scripts/memory_lint.py` 并报告结果（未 init 项目 SKIP 视为通过）。
 
 # 输出模板
 
@@ -33,6 +34,10 @@ alwaysApply: true
 - 新增/更新：...
 - 已执行：...
 - 结果：...
+
+Memory 校验（涉及 memory 写入时）：
+- 已执行：python .cursor/skills/xijia-memory/scripts/memory_lint.py
+- 结果：PASS|SKIP|FAIL
 
 Quality Judge：
 - verdict: pass|revise

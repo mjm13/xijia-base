@@ -16,7 +16,10 @@ description: 归档后知识回灌（spec/change -> docs/domain + ADR + capabili
 4. 执行沉淀三问（规则/决策/数据语义）并更新去向（domain/ADR/data-dictionary）。
 5. 更新 `docs/capability-map.md` 与 `AGENTS.md`（命中触发条件时）。
 6. 轻量代码↔文档漂移检查（delta spec vs domain/capability-map）。
-7. checkpoint 写回 episodic memory（xijia-memory，docs/memory/decisions.jsonl）。`n8. 运行 docs 卫生评分：
+7. checkpoint 写回 episodic memory（xijia-memory；若 `docs/memory/` 缺失则先 ensure scaffold，见 xijia-memory）。
+   - 7a. 蒸馏提议：扫描 `confidence >= 0.8` 且语义稳定的 memory 条目，**提议**蒸馏到 ADR/`docs/domain`（人确认后执行，不自动改长期真相源）。
+   - 7b. 剪枝归档：运行 `python .cursor/skills/xijia-memory/scripts/memory_prune.py`，将过期条目移到 `docs/memory/decisions.archive.jsonl` 并报告归档数（无文件则 SKIP）。
+8. 运行 docs 卫生评分：
    - `python .cursor/skills/xijia-docs-score/scripts/score_docs.py`
 9. 需求状态迁移到 shipped 并修复引用路径。
 10. 提醒：commit 由用户触发，未 commit 不得进入下一需求。
