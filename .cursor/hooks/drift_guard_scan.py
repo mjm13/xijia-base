@@ -14,7 +14,7 @@ SCAN_ROOTS = (
     (ROOT / ".cursor" / "rules").resolve(),
     (ROOT / ".cursor" / "skills").resolve(),
 )
-DRIFT_RE = re.compile(r"Flyway|MyBatis|Spring|JUnit|@SpringBootTest|Mapper|Maven|org_node|BCrypt|Vitest|vite\.config")
+DRIFT_RE = re.compile(r"Flyway|MyBatis|Spring|JUnit|@SpringBootTest|Mapper|Maven|BCrypt|Vitest|vite\.config")
 
 
 def _extract_paths(payload: Any) -> list[str]:

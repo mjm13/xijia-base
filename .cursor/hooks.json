@@ -13,6 +13,11 @@
         "command": "python .cursor/hooks/drift_guard_scan.py",
         "matcher": "Edit|Write|ApplyPatch|MultiEdit",
         "failClosed": false
+      },
+      {
+        "command": "python .cursor/hooks/pipeline_guard.py",
+        "matcher": "Edit|Write|ApplyPatch|MultiEdit",
+        "failClosed": false
       }
     ]
   }

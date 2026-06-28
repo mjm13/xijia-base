@@ -32,6 +32,9 @@ The argument after `/xijia:init` can be:
 - Support two install strategies after stack confirmation:
   - auto install top 2-3 skills per stack
   - recommendation-only (do not install, only report candidates and scores)
+- Default strategy is `auto install`; use `recommendation-only` only when user explicitly selects it
+- In `auto install` mode, if no skills are installed successfully, status must be `blocked` (do not mark `done`)
+- `Skills Installed` must include objective evidence: command used + success/fail + retry reason for failures
 - Run `self-check` before marking `done`
 - Report created files, installed skills, and self-check result
 - In init `requiredFiles`, do not treat on-demand files as required:
@@ -53,6 +56,7 @@ Always return a concise status block:
 - Stack Confirmed: <yes/no + summary>
 - Skills Selected: <name + score + source>
 - Skills Installed: <success/fail list or recommendation-only>
+- Install Evidence: <commands run + key outputs + retries>
 - SelfCheck:
   - requiredFiles: <pass/fail + details>
   - frontmatterValidity: <pass/fail + details>

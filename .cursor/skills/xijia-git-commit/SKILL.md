@@ -31,6 +31,7 @@ description: 生成可追溯的 Git 提交信息——自动关联需求/bug 并
 5. **提交前门禁自检**（来自 `00-workflow.mdc`）：
    - 不含疑似密钥文件（`.env`、`credentials.*` 等），命中则警告并暂停。
    - 一个需求 ideally 一个 commit；同需求多切片可多个 commit。
+   - requirement 文档 `分级与判型` 中 Gate-2 必须已回填审批人/日期（未签字不得作为“已完成提交”对外口径）。
    - 不更新 git config、不加 `--no-verify`、不擅自 `push`、不对已推送提交 `--amend`。
 
 6. **提交并复核**：暂存相关文件，传入 message 执行 `git commit`，提交后用 `git log -1 --format=%B` 确认消息（尤其中文）未损坏，再 `git status` 确认成功。

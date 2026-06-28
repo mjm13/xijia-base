@@ -39,8 +39,24 @@ alwaysApply: true
 Comment Sync：
 - 触达核心业务代码：yes|no
 - 已执行：xijia-comment-enhancer | skipped
-- 文件清单 / 跳过原因：...
-- 结果：done|blocked
+- guard 校验：`pipeline_guard.py --check-comment-sync` exit 0|1（必附，不接受纯自陈）
+- 文件清单 / 跳过原因（白名单条目）：...
+- 结果：done|blocked（guard exit≠0 即 blocked，不得宣告完成）
+
+审批记录（Gate Trace）：
+- Gate-0：状态/审批人/日期（来自 requirement「分级与判型」）
+- Gate-1：状态/审批人/日期（来自 requirement「分级与判型」）
+- Gate-2：状态/审批人/日期（未签字时必须说明）
+
+ADR 命中与落档：
+- 是否命中 ADR 触发条件（依赖/迁移/权限安全）：yes|no
+- ADR 文件：`docs/decisions/*.md` | skipped+reason
+- release guard：`pipeline_guard.py --check-release --req <requirement-file>` exit 0|1
+
+代码↔文档漂移：
+- 是否触达核心业务代码：yes|no
+- docs/domain 或 capability-map 是否同步：yes|no
+- 结果：ok|warn（warn 需写 sync-knowledge 处置结论）
 
 Code Review：
 - 已执行：requesting-code-review | skipped

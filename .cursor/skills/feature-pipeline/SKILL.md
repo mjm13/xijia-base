@@ -17,7 +17,9 @@ description: 端到端功能研发编排入口（DDD + OpenSpec + Superpowers）
 
 ## 一句话流程（速记，细节看 xijia-ops-pipeline）
 
-`Gate-0(需求完整性: complete|partial|reject) → 分级(🟢🟡🔴，链路不清先调用 spike-probe) → 判型(业务/技术/混合) → Gate-1(实现前必须 STOP 待用户批准) → 🔴: explore → propose → analyze → openspec-superpowers-apply → verify(含 xijia-comment-enhancer / requesting-code-review / quality-judge) → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行(TDD + backend/frontend test)→verify(含注释同步 + quality-judge)；收尾 Gate-2(人工验收签字后方可状态迁移/归档)`
+`Gate-0(需求完整性: complete|partial|reject) → 分级(🟢🟡🔴，链路不清先调用 spike-probe) → 判型(业务/技术/混合) → Gate-1(实现前必须 STOP 待用户批准) → 🔴: explore → propose → analyze → openspec-superpowers-apply(写代码即同步 xijia-comment-enhancer 注释) → verify(comment-sync guard 兜底 / requesting-code-review / quality-judge) → sync → archive → sync-knowledge；🟢🟡: Plan Mode 出方案→人审→执行(TDD + backend/frontend test + 写代码即同步注释)→verify(comment-sync guard + quality-judge)；收尾 Gate-2(人工验收签字后方可状态迁移/归档)`
+
+> 注释同步在**写代码阶段**完成（新增即写、修改即更新），verify 仅用 `pipeline_guard.py --check-comment-sync` 兜底，详见 `44-comment-sync.mdc`。
 
 > 实现阶段唯一入口：`openspec-superpowers-apply`（禁止裸跑 `openspec-apply-change`）。
 >

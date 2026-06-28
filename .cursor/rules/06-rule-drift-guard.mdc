@@ -16,9 +16,10 @@ globs:
 
 # 黑名单关键词（初始）
 
-`Flyway|MyBatis|Spring|JUnit|@SpringBootTest|Mapper|Maven|org_node|BCrypt|Vitest|vite.config`
+`Flyway|MyBatis|Spring|JUnit|@SpringBootTest|Mapper|Maven|BCrypt|Vitest|vite.config`
 
 > 仅用于扫描配置，不构成基线约束。
+> 注：`org_node` 等项目既有真实表名不纳入黑名单——它是事实而非栈绑定术语，规则/技能在举例既有数据落点时可如实引用。
 
 # 处理策略
 

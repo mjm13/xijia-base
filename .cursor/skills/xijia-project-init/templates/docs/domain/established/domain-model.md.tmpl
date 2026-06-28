@@ -15,6 +15,7 @@
 
 - INV-001: <invariant statement>
 - INV-002: <invariant statement>
+- INV-003: <invariant statement>（可标注 supersedes: INV-00x）
 
 ### Commands
 
@@ -35,3 +36,9 @@
 
 - 每个聚合必须至少有一条 `INV-xxx` 不变量。
 - 技术壳层能力不写入领域模型。
+
+## 修订记录（动态更新）
+
+| 日期 | change-id | 操作（ADD/UPDATE/SUPERSEDE/DEPRECATE） | 对象（Aggregate/INV） | 说明 |
+| --- | --- | --- | --- | --- |
+| <yyyy-mm-dd> | <change-name> | SUPERSEDE | INV-002 | superseded by INV-003 |

@@ -14,7 +14,7 @@ Run the requirement through a complete and consistent workflow with mandatory hu
 1. Tiering: `green | yellow | red`
 2. Change type classification: `business | technical | hybrid`
 3. Route to the right pipeline branch
-4. Enforce closeout (archive + sync-knowledge for red path)
+4. Enforce closeout (all tiers run sync-knowledge; red additionally archive)
 
 ## Input
 
@@ -35,8 +35,11 @@ The argument after `/xijia:start` can be:
 - For red tier, do not skip OpenSpec + analyze + Superpowers chain
 - Before implementation, present plan/design and STOP for user approval (Gate-1); no non-doc code changes before approval
 - Before marking acceptance done, migrating requirement status, or archiving, STOP for user acceptance sign-off (Gate-2)
-- At verify stage: if core business code was touched, run `xijia-comment-enhancer` per `44-comment-sync.mdc` before Gate-2
+- At apply stage: when adding or changing core business code, sync semantic comments in the SAME edit via `xijia-comment-enhancer` (do not defer to verify), per `44-comment-sync.mdc`
+- At verify stage: run `python .cursor/hooks/pipeline_guard.py --check-comment-sync` as objective backstop; exit≠0 blocks Gate-2
 - At verify stage: run `quality-judge`; if verdict is `revise`, do not proceed to Gate-2
+- After Gate-2, all tiers must run `sync-knowledge` before declaring closeout complete (`tier=green|yellow|red`; red path keeps archive + sync-knowledge)
+- DDD reminder: for `business/hybrid`, require A/B/C/D domain-impact classification before sync-knowledge, and update domain docs dynamically (not append-only); if terminology/BC conflicts exist, stop for human confirmation
 - Never auto-migrate requirement status (e.g. inbox -> shipped) or auto-archive without explicit user confirmation
 - Do not mark complete without closure checks defined by `xijia-ops-pipeline`
 

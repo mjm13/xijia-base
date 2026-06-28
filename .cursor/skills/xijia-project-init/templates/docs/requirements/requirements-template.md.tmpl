@@ -44,10 +44,15 @@ createdAt: <yyyy-mm-dd>
 
 - 尚未想清、需后续切片或 spike 解决的问题
 
-# 数据来源声明（Gate-0 必填）
+# 数据流闭环表（Gate-0 必填，逐能力一行）
 
-- `<功能A>`：真实API | 外部系统对接 | 仅种子(demo) | 人工录入
-- `<功能B>`：真实API | 外部系统对接 | 仅种子(demo) | 人工录入
+> 每条 In-Scope 能力的「来源 → 加工 → 去向」三段必须均为已确认，无空段 / 占位符 / `[待确认]` 才算闭环。
+> 闭环列填 `已确认` 才视为通过；机器校验：`python .cursor/hooks/pipeline_guard.py --check-intake --req <本文件>`
+> 若为 `green-trivial`（纯配置/样式/文档等无业务数据流），可直接声明 `本需求无数据流（green-trivial）` 并跳过闭环表逐行填写。
+
+| 能力/AC | 来源(Source) | 加工(Process) | 去向(Sink) | 闭环 |
+|---|---|---|---|---|
+| `<能力A>` | `<真实API/已有表/外部系统/仅种子(demo)/人工录入 + 落点>` | `<校验/转换/业务规则/状态迁移/直通>` | `<目标表字段/状态/返回/前端展示/外部系统>` | 待确认 |
 
 # 原型偏离审批单（Deviation Ticket，有原型时必填）
 
@@ -67,6 +72,32 @@ createdAt: <yyyy-mm-dd>
 - 可落地范围（In Scope）：...
 - Deferred / 拒绝原因：...
 - 未描述细节清单（需人工确认）：...
+
+# 分级与判型
+
+> 🟢/🟡 需求的方案与验收均在本文件维护，不再单独建 `docs/plans/`；🔴 需求的规格产物仍在 `docs/openspec/changes/<name>/`。
+
+| 项 | 值 |
+|---|---|
+| Tier | green / green-trivial / yellow / red |
+| Change Type | business / technical / hybrid |
+| Tier Rationale | red 触发器命中/未命中说明 |
+| Gate-0 | 状态:complete/partial/reject；审批人:<name>；2026-06-28 |
+| Gate-1 | 状态:待批准/已批准；审批人:<name>；2026-06-28 |
+| Gate-2 | 状态:待验收/已验收；审批人:<name>；2026-06-28 |
+
+# 实现方案（🟢/🟡 必填；🔴 以 OpenSpec 产物为准）
+
+- 架构 / 关键改动：<新增列/接口扩展/服务编排 等>
+- 涉及技术点：<迁移 / API / 前端组件 / 测试 等>
+- 切片拆解：
+  1. <切片 1>
+  2. <切片 2>
+- 回归验证点：
+  - `<后端测试命令，如 pytest tests/test_xxx.py -q>`
+  - `<前端构建/校验命令，如 npm run build>`
+  - 手动：<关键路径手动验证>
+- 关键权衡 / ADR：<命中依赖/迁移/权限安全变更时必须新增或更新 `docs/decisions/*`>
 
 # Spike 探针记录（链路不清时必填）
 

@@ -15,7 +15,8 @@ alwaysApply: true
 - Gate-0（需求完整性闸门）先于分级执行：必须先判定 `complete|partial|reject`（详见 `45-requirement-intake.mdc`）。
 - 分级结论必须附“分级理由”：逐条说明 red 触发器（核心业务 / 复杂规则 / 跨限界上下文）命中或未命中。
 - 分级理由建议使用 Tier Decision Matrix（命中项 + 证据 + 置信度），矩阵规则在 `xijia-ops-pipeline` 维护。
-- 🟢 轻量：Plan Mode + 人审 + 执行；按需落 `docs/plans/`。
+- 🟢 轻量：Plan Mode + 人审 + 执行；分级判型/实现方案/验收记录直接写进 requirement 文档（不再单建 `docs/plans/`）。
+- 🟢-trivial（绿档快车道）：仅配置/样式/文档/锁文件等低风险改动，且不触达核心业务前缀、不命中 Approval Gates。可跳过 Gate-0 数据流闭环表逐行填写（需显式声明 `本需求无数据流（green-trivial）`），但仍保留 Gate-1/Gate-2 人审。
 - 🟡 中等：Plan Mode + 可选 Superpowers；必要时升档。
 - 🔴 核心：完整链路 `explore -> propose -> analyze -> apply -> verify -> sync -> archive -> sync-knowledge`。
 - 🧪 spike：链路不清时先探针，代码不得直接作为交付成果。
@@ -46,18 +47,21 @@ alwaysApply: true
 - 仅在 `sync -> archive -> sync-knowledge` 后提升到 `docs/domain/*`。
 - `docs/domain/*` 只存已发布事实，作为 AI 读取现状的唯一领域真相源。
 - `docs/architecture.md`、`docs/capability-map.md` 仅允许在收尾阶段更新。
+- `AGENTS.md` 为活文档：需求迭代后若命中任一变化（dev/build/test/deploy 命令、顶层目录/模块职责、关键入口、关键外部依赖/技术栈版本、安全边界、提交/PR 约定）必须在收尾阶段增量更新；不得引用已删除脚本/命令。
+- DDD 同步提醒：领域文档必须“先判定后更新”，禁止无异议累加。`business/hybrid` 先做 A/B/C/D 分类（新 BC / 改聚合不变量 / 仅字段语义 / 无领域影响）；同词异义或边界冲突先 stop-and-report，人工确认后再写入。
 
 # 收尾门禁（不得跳过）
 
 1. verify：测试/构建有证据。
-2. 注释同步：若本次新增或修改核心业务代码（API 端点、Service/业务处理单元、跨模块编排），必须调用 `xijia-comment-enhancer` 按端点层/内部层补全语义注释（先内部层再端点层）；纯文档/配置/样式改动可跳过并说明原因（详见 `44-comment-sync.mdc`）。
-3. 文档同步：🔴 走 `sync -> archive -> sync-knowledge`；🟢/🟡 完成等价同步。
-4. 验收记录：写入需求或计划文档（人工可复现）。
-5. Gate-2：用户人工验收签字后，方可状态迁移/归档。
-6. commit：本需求代码与同步文档一起提交（由用户触发执行）。
-7. 对 `partial/reject` 产出的 Deferred 项，必须写入 `docs/requirements/backlog.md` 后方可收尾。
+2. 注释同步：若本次新增或修改核心业务代码（API 端点、Service/业务处理单元、跨模块编排、核心业务/持久化模型），必须在**写代码阶段**调用 `xijia-comment-enhancer` 同步输出或更新语义注释（先内部层/模型层，再端点层）；verify 阶段必须运行 comment-sync guard 兜底校验。纯文档/配置/样式改动可跳过并说明原因（详见 `44-comment-sync.mdc`）。
+3. 文档同步：所有档位收尾均执行 `sync-knowledge`，由 `tier` 决定执行范围（red 全量；green/yellow 轻量）。
+4. 验收记录：写入对应 requirement 文档的「验收记录」章节（人工可复现）。
+5. 收尾聚合自检：进入 Gate-2 前运行 `python .cursor/hooks/pipeline_guard.py --check-release --req <requirement-file>`，客观项（comment-sync / 后端测试存在性 / 审批记录 / ADR 命中校验）exit≠0 即阻断；并按其提示逐条确认人工门禁（code-review / quality-judge / Deferred 入池）。
+6. Gate-2：用户人工验收签字后，方可状态迁移/归档；需求文档必须回填 Gate-2 审批人/日期留痕。
+7. commit：本需求代码与同步文档一起提交（由用户触发执行）。
+8. 对 `partial/reject` 产出的 Deferred 项，必须写入 `docs/requirements/backlog.md` 后方可收尾。
 
-- 未完成第 1-6 步，不得开启下一需求。
+- 未完成第 1-8 步，不得开启下一需求。
 - “需求完成”的对外口径为：已达到可提交状态并已提醒用户执行 commit；若尚未 commit，必须明确为“待提交完成”。
 - 禁止“口头完成”，必须给出验证结果与未执行项。
 
