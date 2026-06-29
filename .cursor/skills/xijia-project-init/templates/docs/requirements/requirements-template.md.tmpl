@@ -3,6 +3,9 @@ title: <requirement-title>
 status: inbox
 owner: <owner>
 createdAt: <yyyy-mm-dd>
+tier: green | green-trivial | yellow | red
+type: business | technical | hybrid
+openspec_change: <kebab-case-or-empty>
 ---
 
 # 背景
@@ -75,12 +78,13 @@ createdAt: <yyyy-mm-dd>
 
 # 分级与判型
 
+> **机器可读真相源**：YAML frontmatter 的 `tier` / `type`（`tier=red` 时另填 `openspec_change`）。下表 Tier / Change Type 必须与 frontmatter 一致；路由与 guard 以 frontmatter 为准。
 > 🟢/🟡 需求的方案与验收均在本文件维护，不再单独建 `docs/plans/`；🔴 需求的规格产物仍在 `docs/openspec/changes/<name>/`。
 
 | 项 | 值 |
 |---|---|
-| Tier | green / green-trivial / yellow / red |
-| Change Type | business / technical / hybrid |
+| Tier | 与 frontmatter `tier` 一致 |
+| Change Type | 与 frontmatter `type` 一致 |
 | Tier Rationale | red 触发器命中/未命中说明 |
 | Gate-0 | 状态:complete/partial/reject；审批人:<name>；2026-06-28 |
 | Gate-1 | 状态:待批准/已批准；审批人:<name>；2026-06-28 |

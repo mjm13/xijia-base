@@ -35,7 +35,7 @@ Decision-ready snapshot in **≤3 tool rounds**:
 
 ## How to determine status
 
-1. From the **single** requirement doc: tier, change type, Gate-0/1/2 fields, AC checklist state.
+1. From the **single** requirement doc: **YAML frontmatter** `tier` / `type`（优先），Gate-0/1/2 fields, AC checklist state. 正文「分级与判型」表格须与 frontmatter 一致。
 2. Infer stage from **that doc + one change folder** (if applicable):
    - `plan` → `apply` → `verify` → `sync-knowledge` (green/yellow)
    - `explore` → `propose` → `analyze` → `apply` → … (red)

@@ -15,6 +15,7 @@ alwaysApply: true
 - Gate-0（需求完整性闸门）先于分级执行：必须先判定 `complete|partial|reject`（详见 `45-requirement-intake.mdc`）。
 - 分级结论必须附“分级理由”：逐条说明 red 触发器（核心业务 / 复杂规则 / 跨限界上下文）命中或未命中。
 - 分级理由建议使用 Tier Decision Matrix（命中项 + 证据 + 置信度），矩阵规则在 `xijia-ops-pipeline` 维护。
+- **分级与判型完成后**，必须将 `tier` 与 `type` 写入 requirement 文档 **YAML frontmatter**（机器可读真相源）；正文「分级与判型」章节的 Tier / Change Type 须与 frontmatter 一致；`tier=red` 时另填 `openspec_change`。
 - 🟢 轻量：Plan Mode + 人审 + 执行；分级判型/实现方案/验收记录直接写进 requirement 文档（不再单建 `docs/plans/`）。
 - 🟢-trivial（绿档快车道）：仅配置/样式/文档/锁文件等低风险改动，且不触达核心业务前缀、不命中 Approval Gates。可跳过 Gate-0 数据流闭环表逐行填写（需显式声明 `本需求无数据流（green-trivial）`），但仍保留 Gate-1/Gate-2 人审。
 - 🟡 中等：Plan Mode + 可选 Superpowers；必要时升档。
