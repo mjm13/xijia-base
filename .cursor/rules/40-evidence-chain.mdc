@@ -1,6 +1,11 @@
 ---
 description: 证据链门禁（方案、影响评估、根因定位前必须取证）
-alwaysApply: true
+alwaysApply: false
+globs:
+  - backend/**
+  - frontend/**
+  - docs/requirements/**
+  - docs/openspec/**
 ---
 
 # 目标

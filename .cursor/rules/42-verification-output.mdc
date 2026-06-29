@@ -1,6 +1,11 @@
 ﻿---
-description: 验证输出门禁（完成声明前必须给证据）
-alwaysApply: true
+description: 验证输出门禁（完成声明前必须给证据；verify/收尾阶段加载）
+alwaysApply: false
+globs:
+  - backend/**
+  - frontend/**
+  - docs/requirements/**
+  - docs/openspec/**
 ---
 
 # 目标

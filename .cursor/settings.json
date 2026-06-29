@@ -3,5 +3,15 @@
     "superpowers": {
       "enabled": true
     }
+  },
+  "files.watcherExclude": {
+    "**/.agents/**": true,
+    "**/frontend/node_modules/**": true,
+    "**/backend/.venv/**": true
+  },
+  "search.exclude": {
+    "**/.agents": true,
+    "**/frontend/node_modules": true,
+    "**/backend/.venv": true
   }
 }

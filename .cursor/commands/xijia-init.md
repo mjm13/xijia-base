@@ -15,7 +15,7 @@ Initialize project documentation and structure for a new/empty repository:
 2. Collect minimal project bootstrap information
 3. Generate skeleton docs and workflow files
 4. Ask user to confirm technology stack
-5. Install top-rated skills matching the confirmed stack
+5. Install top-rated skills matching the confirmed stack (**hard cap: 10 total**; skip if not found — no substitutes)
 6. Keep `docs/architecture.md` and `docs/capability-map.md` as on-demand artifacts (not init pre-generated)
 
 ## Input
@@ -30,10 +30,12 @@ The argument after `/xijia:init` can be:
 - Stop by default if `docs/` or `AGENTS.md` already exists
 - Do not set technology stack without user confirmation
 - Support two install strategies after stack confirmation:
-  - auto install top 2-3 skills per stack
+  - auto install: per stack top 2–3, **≤10 skills total**
   - recommendation-only (do not install, only report candidates and scores)
 - Default strategy is `auto install`; use `recommendation-only` only when user explicitly selects it
-- In `auto install` mode, if no skills are installed successfully, status must be `blocked` (do not mark `done`)
+- **找不到就不装**：单个 skill 安装失败或未找到匹配项时，记录 skipped + 原因，**禁止**用其它 skill、整库或其它 repo 顶替
+- In `auto install` mode, **zero stack skills installed is allowed** if all candidates failed/skipped; do not mark `blocked` solely for that reason
+- If installed count **>10** or bulk install detected, status must be `blocked`
 - `Skills Installed` must include objective evidence: command used + success/fail + retry reason for failures
 - Run `self-check` before marking `done`
 - Report created files, installed skills, and self-check result
@@ -55,7 +57,8 @@ Always return a concise status block:
 - Skipped: <existing files kept untouched>
 - Stack Confirmed: <yes/no + summary>
 - Skills Selected: <name + score + source>
-- Skills Installed: <success/fail list or recommendation-only>
+- Skills Installed: <success list or recommendation-only>
+- Skills Skipped: <name + reason>
 - Install Evidence: <commands run + key outputs + retries>
 - SelfCheck:
   - requiredFiles: <pass/fail + details>

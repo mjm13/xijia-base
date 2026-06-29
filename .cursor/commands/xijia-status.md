@@ -2,49 +2,63 @@
 name: /xijia-status
 id: xijia-status
 category: Workflow
-description: Show current Xijia pipeline stage and next actions
+description: Lightweight pipeline snapshot (fast, no full guard audit)
 ---
 
-Inspect current workspace context and report the current Xijia pipeline status.
+Provide a **fast, read-only** Xijia pipeline snapshot. Optimized for speed — not a release/verify audit.
 
 ## Goal
 
-Provide a fast, decision-ready snapshot:
+Decision-ready snapshot in **≤3 tool rounds**:
 
-- Tier: `green | yellow | red`
-- Change type: `business | technical | hybrid` (if identified)
-- Current stage
-- Progress signals (artifacts/tasks)
-- Next best action
-- Blockers / required confirmations
+- Active requirement / change (if any)
+- Tier, change type, stage (from file evidence only)
+- Git working tree summary
+- Optional quick test signal (only when backend changed)
+- Next single action + blockers
+
+## Scope (strict — do NOT expand)
+
+### Allowed reads (pick minimal set)
+
+1. **One** active requirement: `docs/requirements/inbox/*.md` — prefer the file user named; else the most recently modified inbox file only.
+2. **If red tier suspected**: list `docs/openspec/changes/<name>/` for that change only (do not scan all changes).
+3. `git status --short` (once).
+4. **Optional** (only if requirement or git shows backend code touched): `cd backend && pytest -q --tb=no` with 60s budget; on failure report exit code only.
+
+### Forbidden in this command
+
+- Do **not** run `pipeline_guard.py` (`--check-release`, `--audit`, `--check-intake`, etc.).
+- Do **not** load `xijia-ops-pipeline` full skill body or invoke verify/comment-sync/code-review/quality-judge.
+- Do **not** read `.agents/**`, `document/**`, or unrelated requirement files.
+- Do **not** implement code or mutate artifacts unless the user asks.
 
 ## How to determine status
 
-1. Read `.cursor/rules/00-workflow.mdc` for tiering and gate criteria.
-2. Inspect active change context (if any) via OpenSpec status/instructions.
-3. Infer stage from evidence, using this order:
-   - `explore` -> `propose` -> `apply` -> `verify` -> `sync` -> `archive` -> `sync-knowledge`
-4. If no active OpenSpec change is needed, report as green/yellow plan path.
-5. If information is ambiguous, explicitly mark fields as `unknown` and ask one focused follow-up question.
+1. From the **single** requirement doc: tier, change type, Gate-0/1/2 fields, AC checklist state.
+2. Infer stage from **that doc + one change folder** (if applicable):
+   - `plan` → `apply` → `verify` → `sync-knowledge` (green/yellow)
+   - `explore` → `propose` → `analyze` → `apply` → … (red)
+3. Mark `unknown` when evidence missing; ask **one** focused follow-up question max.
 
 ## Output format
 
-Always use this block:
-
 ```markdown
-## Xijia Pipeline Status
+## Xijia Pipeline Status (lightweight)
 
-- Tier: <green|yellow|red|unknown>
+- Requirement: <path|none>
+- Tier: <green|green-trivial|yellow|red|unknown>
 - Change: <name|none>
 - Change Type: <business|technical|hybrid|unknown>
-- Stage: <explore|propose|apply|verify|sync|archive|sync-knowledge|abandon|plan>
-- Progress: <N/M tasks, artifacts state, or n/a>
-- Next: <single best next command/skill>
+- Stage: <explore|propose|analyze|apply|verify|sync|archive|sync-knowledge|plan|unknown>
+- Git: <clean | N modified/untracked (summary)>
+- Tests: <passed|failed|skipped — reason>
+- Next: <single best command/skill>
 - Blockers: <none or list>
+- Note: Full release audit → `/xijia:start` verify phase or `pipeline_guard.py --check-release`
 ```
 
 ## Guardrails
 
-- Do not implement code in this command.
-- Do not mutate artifacts unless the user asks.
-- Prefer concrete evidence over assumptions.
+- Target latency: answer after minimal reads; prefer inference from requirement doc over deep repo scan.
+- If user needs full Gate-2 / release guard evidence, tell them to run verify phase explicitly — do not run it here.
