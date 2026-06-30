@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import subprocess
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -35,6 +37,7 @@ class DocStats:
     classification: str = ""
     useless_candidate: bool = False
     negative_candidate: bool = False
+    stale_candidate: bool = False
     candidate_reasons: list[str] | None = None
 
     def __post_init__(self) -> None:
@@ -44,6 +47,49 @@ class DocStats:
             self.sessions = set()
         if self.candidate_reasons is None:
             self.candidate_reasons = []
+
+
+def is_aux_doc(doc: str) -> bool:
+    name = Path(doc).name
+    return name.startswith("_") or name.lower() == "readme.md"
+
+
+def is_experience_doc(doc: str) -> bool:
+    return doc.startswith("docs/pitfalls/") or doc.startswith("docs/patterns/")
+
+
+def parse_frontmatter(text: str) -> str:
+    if not text.startswith("---\n"):
+        return ""
+    end = text.find("\n---\n", 4)
+    if end == -1:
+        return ""
+    return text[4:end]
+
+
+def extract_frontmatter_fields(doc_path: Path) -> tuple[str | None, list[str]]:
+    if not doc_path.exists():
+        return None, []
+    text = doc_path.read_text(encoding="utf-8")
+    frontmatter = parse_frontmatter(text)
+    if not frontmatter:
+        return None, []
+    last_verified_match = re.search(r"(?m)^last_verified:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})\s*$", frontmatter)
+    last_verified = last_verified_match.group(1) if last_verified_match else None
+    source_paths = re.findall(r"(?m)^\s*path:\s*([^\n#]+?)\s*$", frontmatter)
+    cleaned = [p.strip().strip("'\"") for p in source_paths if p.strip()]
+    return last_verified, cleaned
+
+
+def git_latest_change_ts(path_str: str) -> datetime | None:
+    cmd = ["git", "log", "-1", "--format=%cI", "--", path_str]
+    try:
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, check=False)
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    return to_dt(proc.stdout.strip())
 
 
 def iter_docs() -> list[str]:
@@ -177,9 +223,11 @@ def aggregate_scores() -> dict[str, DocStats]:
                 reason = row.get("reason")
                 item.last_judgment_reason = reason if isinstance(reason, str) else None
 
-    for item in stats.values():
+    for doc, item in stats.items():
         item.score = item.useful - item.misleading
         item.classification = classify(item)
+        if is_aux_doc(doc):
+            continue
         if item.used_count == 0:
             item.useless_candidate = True
             item.candidate_reasons.append("从未被用")
@@ -192,6 +240,26 @@ def aggregate_scores() -> dict[str, DocStats]:
         if item.score < 0:
             item.negative_candidate = True
             item.candidate_reasons.append("误导判定多于有用判定")
+        if is_experience_doc(doc):
+            last_verified, source_paths = extract_frontmatter_fields(ROOT / doc)
+            if not last_verified:
+                item.stale_candidate = True
+                item.candidate_reasons.append("缺少 last_verified，无法确认经验时效")
+                continue
+            last_verified_dt = to_dt(f"{last_verified}T00:00:00+00:00")
+            if not source_paths:
+                item.stale_candidate = True
+                item.candidate_reasons.append("缺少 sources.path，无法进行腐化检测")
+                continue
+            if last_verified_dt is None:
+                item.stale_candidate = True
+                item.candidate_reasons.append("last_verified 格式无效")
+                continue
+            source_updates = [git_latest_change_ts(path) for path in source_paths]
+            source_updates = [ts for ts in source_updates if ts is not None]
+            if source_updates and max(source_updates) > last_verified_dt:
+                item.stale_candidate = True
+                item.candidate_reasons.append("sources 已更新，经验文档待复核")
     return stats
 
 
@@ -215,6 +283,7 @@ def serialize(stats: dict[str, DocStats]) -> dict[str, Any]:
                 "session_count": len(item.sessions),
                 "useless_candidate": item.useless_candidate,
                 "negative_candidate": item.negative_candidate,
+                "stale_candidate": item.stale_candidate,
                 "candidate_reasons": item.candidate_reasons,
             }
         )
@@ -249,7 +318,7 @@ def write_report(payload: dict[str, Any]) -> None:
         lines.append(f"- `{item['doc']}`：score={item['score']} used={item['used_count']}")
 
     lines.extend(["", "## 从未被用（删除候选）", ""])
-    never_used = [d for d in docs if d["used_count"] == 0]
+    never_used = [d for d in docs if d["used_count"] == 0 and not is_aux_doc(d["doc"])]
     if never_used:
         for item in sorted(never_used, key=lambda d: d["doc"]):
             lines.append(f"- `{item['doc']}`")
@@ -262,6 +331,15 @@ def write_report(payload: dict[str, Any]) -> None:
         for item in sorted(negative, key=lambda d: (d["score"], d["doc"])):
             reasons = "；".join(item.get("candidate_reasons") or [])
             lines.append(f"- `{item['doc']}`（score={item['score']}）: {reasons}")
+    else:
+        lines.append("- 无")
+
+    lines.extend(["", "## 待复核经验文档（sources 晚于 last_verified）", ""])
+    stale = [d for d in docs if d.get("stale_candidate")]
+    if stale:
+        for item in sorted(stale, key=lambda d: d["doc"]):
+            reasons = "；".join(item.get("candidate_reasons") or [])
+            lines.append(f"- `{item['doc']}`: {reasons}")
     else:
         lines.append("- 无")
 

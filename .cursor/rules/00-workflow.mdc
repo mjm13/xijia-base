@@ -47,6 +47,7 @@ alwaysApply: true
 - 开发中领域草稿只写 `docs/openspec/changes/<name>/domain/`。
 - 仅在 `sync -> archive -> sync-knowledge` 后提升到 `docs/domain/*`。
 - `docs/domain/*` 只存已发布事实，作为 AI 读取现状的唯一领域真相源。
+- 进入 explore/apply 前必须检索 `docs/pitfalls/*` 与 `docs/patterns/*`，命中项写入 requirement「实现记录」（未命中需显式记录 `Experience Reuse: none`）。
 - `docs/architecture.md`、`docs/capability-map.md` 仅允许在收尾阶段更新。
 - `AGENTS.md` 为活文档：需求迭代后若命中任一变化（dev/build/test/deploy 命令、顶层目录/模块职责、关键入口、关键外部依赖/技术栈版本、安全边界、提交/PR 约定）必须在收尾阶段增量更新；不得引用已删除脚本/命令。
 - DDD 同步提醒：领域文档必须“先判定后更新”，禁止无异议累加。`business/hybrid` 先做 A/B/C/D 分类（新 BC / 改聚合不变量 / 仅字段语义 / 无领域影响）；同词异义或边界冲突先 stop-and-report，人工确认后再写入。
@@ -82,3 +83,4 @@ alwaysApply: true
 - 纠错学习：`43-correction-learning.mdc`
 - 注释同步：`44-comment-sync.mdc`
 - 需求完整性：`45-requirement-intake.mdc`
+- Git 分支与隔离工作区：`46-git-branching.mdc`
