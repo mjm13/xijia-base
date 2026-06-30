@@ -50,17 +50,32 @@ INBOX_DIR = (ROOT / "docs" / "requirements" / "inbox").resolve()
 CHANGES_DIR = (ROOT / "docs" / "openspec" / "changes").resolve()
 NOTICE_MARKER = ROOT / "scripts" / ".generated" / "pipeline_guard_notice.txt"
 
-# Implementation code (edits here imply we are in apply stage).
-IMPL_PREFIXES = ("backend/app/", "frontend/src/")
+# Stack-agnostic implementation file detection:
+# use code extensions + exclusion list instead of fixed framework directories.
+CODE_FILE_RE = re.compile(
+    r"\.(py|ts|tsx|js|jsx|java|kt|go|rs|cs|php|rb|swift|c|cc|cpp|h|hpp|vue)$",
+    re.IGNORECASE,
+)
 # Paths that are NOT counted as implementation code.
 NON_IMPL_RE = re.compile(r"(^|/)(tests?|__tests__)/|(^|/)test_|\.(test|spec)\.|\.md$|\.json$")
-# Files in these areas are treated as core business code for comment-sync.
-COMMENT_SYNC_PREFIXES = (
-    "backend/app/access/",
-    "backend/app/api/",
-    "backend/app/models/",
-    "backend/app/org/",
-    "backend/app/system/",
+NON_IMPL_PREFIXES = (
+    ".cursor/",
+    "docs/",
+    "document/",
+    "frontend/node_modules/",
+    "frontend/dist/",
+    "backend/.venv/",
+    "backend/logs/",
+    "scripts/",
+    "assets/",
+    "mcps/",
+)
+COMMENT_SYNC_EXCLUDE_RE = re.compile(
+    r"(^|/)(__init__\.py|apps\.py|urls\.py|wsgi\.py|asgi\.py|manage\.py|settings\.py|seed_baseline\.py)$|(^|/)migrations/",
+)
+BACKEND_ENDPOINT_RE = re.compile(
+    r"^backend/.*(/api/|/views\.py$|/controllers?\.py$|/endpoints?\.py$)",
+    re.IGNORECASE,
 )
 
 # Frontmatter change types that imply business semantics / red-ish path (legacy fallback).
@@ -74,6 +89,92 @@ BODY_TIER_RE = re.compile(
 
 # Semantic comment tags from xijia-comment-enhancer (endpoint + internal layers).
 SEMANTIC_TAG_RE = re.compile(r"\[(核心目的|接口地址|功能描述|业务逻辑)\]")
+ENDPOINT_REQUIRED_TAGS = ("接口地址", "功能描述", "业务逻辑")
+FRONTEND_API_DIR = (ROOT / "frontend" / "src" / "api").resolve()
+
+def _project_has_frontend() -> bool:
+    return FRONTEND_API_DIR.is_dir()
+
+
+def _extract_endpoint_comment_blocks(text: str) -> list[str]:
+    blocks: list[str] = []
+    lines = text.splitlines()
+    for idx, line in enumerate(lines):
+        if "@api_view" not in line:
+            continue
+        block_lines: list[str] = []
+        j = idx - 1
+        while j >= 0 and lines[j].strip().startswith("#"):
+            block_lines.insert(0, lines[j].strip())
+            j -= 1
+        if block_lines:
+            blocks.append("\n".join(block_lines))
+    return blocks
+
+
+def _endpoint_addr(block: str) -> str:
+    match = re.search(r"\[接口地址\]:\s*(.+)", block)
+    return match.group(1).strip() if match else ""
+
+
+def _endpoint_parts(addr: str) -> list[str]:
+    path = addr.replace("/api", "", 1).strip("/")
+    return [part for part in path.split("/") if part]
+
+
+def _is_ui_mapped_endpoint(addr: str) -> bool:
+    """Match only endpoints with evidence in frontend/src/api (by path shape)."""
+    parts = _endpoint_parts(addr)
+    if parts in (["auth", "login"], ["auth", "logout"], ["auth", "me"]):
+        return True
+    if parts == ["system", "users"]:
+        return True
+    if parts == ["system", "menus"]:
+        return True
+    if len(parts) == 3 and parts[:2] == ["system", "permissions"]:
+        return True
+    if (
+        len(parts) == 4
+        and parts[0] == "system"
+        and parts[1] == "roles"
+        and parts[3] == "permissions"
+    ):
+        return True
+    return False
+
+
+def _endpoint_comment_issues(rel: str, text: str) -> list[str]:
+    if not BACKEND_ENDPOINT_RE.search(rel) or "@api_view" not in text:
+        return []
+    issues: list[str] = []
+    blocks = _extract_endpoint_comment_blocks(text)
+    if not blocks:
+        return [f"{rel}: 存在 @api_view 但缺少端点注释块"]
+    has_frontend = _project_has_frontend()
+    for idx, block in enumerate(blocks, 1):
+        addr = _endpoint_addr(block)
+        label = f"{rel} 端点#{idx} ({addr or 'unknown'})"
+        for tag in ENDPOINT_REQUIRED_TAGS:
+            if f"[{tag}]" not in block:
+                issues.append(f"{label} 缺少 [{tag}]")
+        if not has_frontend or not addr or not _is_ui_mapped_endpoint(addr):
+            continue
+        if "[前端路径]" not in block:
+            issues.append(f"{label} 已在 frontend/src/api 映射，缺少 [前端路径]")
+        if "/system/" in addr and "[业务菜单]" not in block:
+            issues.append(f"{label} 已在 frontend/src/api 映射，缺少 [业务菜单]")
+    return issues
+
+
+def _collect_endpoint_comment_issues(files: list[str]) -> list[str]:
+    issues: list[str] = []
+    for rel in files:
+        target = (ROOT / rel).resolve()
+        if not target.is_file():
+            continue
+        text = target.read_text(encoding="utf-8", errors="ignore")
+        issues.extend(_endpoint_comment_issues(rel, text))
+    return issues
 
 
 # --------------------------------------------------------------------------- #
@@ -357,11 +458,20 @@ def _to_rel(path_value: str) -> str | None:
 
 
 def _is_impl_code(rel: str) -> bool:
-    return rel.startswith(IMPL_PREFIXES) and not NON_IMPL_RE.search(rel)
+    return (
+        bool(CODE_FILE_RE.search(rel))
+        and not rel.startswith(NON_IMPL_PREFIXES)
+        and not NON_IMPL_RE.search(rel)
+    )
 
 
 def _is_comment_sync_code(rel: str) -> bool:
-    return rel.startswith(COMMENT_SYNC_PREFIXES) and not NON_IMPL_RE.search(rel)
+    return (
+        _is_impl_code(rel)
+        and bool(BACKEND_ENDPOINT_RE.search(rel))
+        and not NON_IMPL_RE.search(rel)
+        and not COMMENT_SYNC_EXCLUDE_RE.search(rel)
+    )
 
 
 def _already_noticed_today() -> bool:
@@ -380,13 +490,14 @@ def _run_hook() -> int:
     except json.JSONDecodeError:
         return 0
 
-    edited_impl = {rel for raw in _extract_paths(payload) if (rel := _to_rel(raw)) and _is_impl_code(rel)}
-    if not edited_impl:
+    edited_endpoints = {
+        rel for raw in _extract_paths(payload) if (rel := _to_rel(raw)) and _is_comment_sync_code(rel)
+    }
+    if not edited_endpoints:
         return 0
 
-    missing_comments = sorted(
-        rel for rel in edited_impl if _is_comment_sync_code(rel) and not _file_has_semantic_comment(rel)
-    )
+    missing_comments = sorted(rel for rel in edited_endpoints if not _file_has_semantic_comment(rel))
+    endpoint_issues = _collect_endpoint_comment_issues(sorted(edited_endpoints))
     if missing_comments:
         print("[pipeline-guard] 核心业务代码已编辑，但文件缺少 xijia 语义注释标签：")
         for rel in missing_comments:
@@ -395,6 +506,14 @@ def _run_hook() -> int:
             "  → 写代码阶段必须同步注释：新增核心代码需按 xijia-comment-enhancer 输出注释；"
             "修改核心逻辑需同步更新既有注释。不得等到 verify 再补。"
         )
+    if endpoint_issues:
+        print("[pipeline-guard] 端点注释块不完整（缺少必填维或 UI 映射维）：")
+        for issue in endpoint_issues:
+            print(f"  - {issue}")
+        print("  → 按 xijia-comment-enhancer 补全 [接口地址]/[功能描述]/[业务逻辑]，"
+              "且 frontend/src/api 已映射的端点须补 [前端路径]/[业务菜单]。")
+    if missing_comments or endpoint_issues:
+        return 0
 
     red_reqs = _red_requirements()
     if not red_reqs or _has_any_change_product():
@@ -545,6 +664,7 @@ def _run_check_comment_sync(base: str) -> int:
         return 0
 
     missing = [rel for rel in impl_files if not _file_has_semantic_comment(rel)]
+    endpoint_issues = _collect_endpoint_comment_issues(impl_files)
     if missing:
         print("[pipeline-guard] 以下实现文件无任何语义注释标签（comment-sync 未完成）：")
         for rel in missing:
@@ -554,10 +674,19 @@ def _run_check_comment_sync(base: str) -> int:
             "纯文档/配置/样式/测试改动不应出现在此清单。"
         )
         return 1
+    if endpoint_issues:
+        print("[pipeline-guard] 以下端点注释块不完整（comment-sync 未完成）：")
+        for issue in endpoint_issues:
+            print(f"  - {issue}")
+        print(
+            "  → 每个 @api_view 端点须含 [接口地址]/[功能描述]/[业务逻辑]；"
+            "frontend/src/api 已映射端点还须补 [前端路径]（/system/* 另需 [业务菜单]）。"
+        )
+        return 1
 
     print(
         f"[pipeline-guard] OK：{len(impl_files)} 个变更实现文件均含语义注释标签"
-        "（文件级启发式，仍需人工确认改动函数已覆盖）。"
+        "（含端点块必填维与 UI 映射维校验）。"
     )
     return 0
 
@@ -582,7 +711,7 @@ def _needs_adr(files: list[str]) -> bool:
             return True
         if rel.startswith("backend/alembic/versions/") and rel.endswith(".py"):
             return True
-        if rel.startswith("backend/app/access/") or "/auth" in rel:
+        if CODE_FILE_RE.search(rel) and re.search(r"(auth|permission|rbac|security|secret|token)", rel, re.IGNORECASE):
             return True
     return False
 
@@ -594,17 +723,23 @@ def _run_check_release(base: str, req_path: str) -> int:
 
     impl_files = _changed_impl_files(base)
     missing = [rel for rel in impl_files if not _file_has_semantic_comment(rel)]
+    endpoint_issues = _collect_endpoint_comment_issues(impl_files)
     if missing:
         blocking.append("comment-sync 未完成")
         print("[release] comment-sync 缺失（核心业务文件无语义注释）：")
         for rel in missing:
             print(f"  - {rel}")
+    elif endpoint_issues:
+        blocking.append("端点注释块不完整")
+        print("[release] comment-sync 缺失（端点注释块不完整）：")
+        for issue in endpoint_issues:
+            print(f"  - {issue}")
     elif impl_files:
         print(f"[release] comment-sync OK：{len(impl_files)} 个核心业务文件均含语义注释标签。")
     else:
         print("[release] 本次未触达核心业务代码（comment-sync 不适用）。")
 
-    backend_impl = [rel for rel in impl_files if rel.startswith("backend/app/")]
+    backend_impl = [rel for rel in impl_files if rel.startswith("backend/")]
     if backend_impl and not _changed_test_files(base):
         blocking.append("后端业务代码变更但无测试文件变更")
         print("[release] 后端核心业务代码已改，但未见 backend/tests 下测试变更（TDD 门禁存疑）：")
